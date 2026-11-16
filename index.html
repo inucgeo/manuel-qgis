@@ -1,0 +1,1486 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Manuel QGIS 4.4 – M1</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Mise en page : sommaire fixe à gauche (repliable sur mobile), colonne de lecture unique à droite.
+   Les deux accents codent les deux parcours du master : terre cuite = aménagement urbain, bleu-vert = environnement. */
+:root{
+  --paper:#f7f4ee; --surface:#fffdf8; --ink:#1f2a2e; --muted:#5a6769; --rule:#d8d2c3;
+  --teal:#1c6a6d; --teal-soft:#dcebe8; --terra:#a94c2a; --terra-soft:#f4e2d7;
+  --ochre:#7d5f12; --ochre-soft:#f1e7c9; --ok:#2a7347; --ok-soft:#dcefe2; --ko:#a3352c; --ko-soft:#f6dedb;
+  --serif:"EB Garamond",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans","Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",Consolas,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#141a1c; --surface:#1c2426; --ink:#e9e5da; --muted:#a3adab; --rule:#34413f;
+  --teal:#74c5bf; --teal-soft:#1b3635; --terra:#e8a07f; --terra-soft:#3c2920;
+  --ochre:#d9bd6a; --ochre-soft:#3a3218; --ok:#7fcf9c; --ok-soft:#1c3526; --ko:#ee9a90; --ko-soft:#3f2320;
+  color-scheme:dark } }
+:root[data-theme="dark"]{
+  --paper:#141a1c; --surface:#1c2426; --ink:#e9e5da; --muted:#a3adab; --rule:#34413f;
+  --teal:#74c5bf; --teal-soft:#1b3635; --terra:#e8a07f; --terra-soft:#3c2920;
+  --ochre:#d9bd6a; --ochre-soft:#3a3218; --ok:#7fcf9c; --ok-soft:#1c3526; --ko:#ee9a90; --ko-soft:#3f2320;
+  color-scheme:dark }
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:4.5rem}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.6; margin:0}
+a{color:var(--teal); text-underline-offset:2px}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid var(--terra); outline-offset:2px}
+h1,h2,h3{font-family:var(--serif); font-weight:500; line-height:1.15; text-wrap:balance; margin:0}
+h1{font-size:clamp(2.1rem,5vw,3.2rem)}
+h2{font-size:clamp(1.7rem,3.6vw,2.3rem)}
+h3{font-size:1.45rem; margin-top:2.2rem; padding-top:.9rem; border-top:1px solid var(--rule)}
+h4{font-family:var(--sans); font-size:1rem; font-weight:600; margin:1.4rem 0 .3rem}
+p{margin:.7rem 0}
+ul,ol{padding-left:1.3rem; margin:.6rem 0}
+li{margin:.25rem 0}
+code,kbd,.menu{font-family:var(--mono); font-size:.86em}
+code{background:var(--teal-soft); padding:.08em .35em; border-radius:3px; overflow-wrap:anywhere}
+kbd{border:1px solid var(--rule); border-bottom-width:2px; border-radius:4px; padding:0 .35em; background:var(--surface); white-space:nowrap}
+.menu{color:var(--terra); font-weight:500}
+pre{font-family:var(--mono); font-size:.85rem; background:var(--surface); border:1px solid var(--rule); padding:.8rem 1rem; overflow-x:auto; border-radius:4px}
+.eyebrow{font-size:.74rem; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); font-weight:600}
+
+/* barre supérieure */
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px); z-index:10; background:var(--paper)}
+.topbar{position:sticky; top:env(safe-area-inset-top,0px); z-index:9; background:var(--paper); border-bottom:1px solid var(--rule)}
+.topbar-in{display:flex; flex-wrap:wrap; align-items:center; gap:.6rem 1.2rem; padding-block:.55rem;
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); max-width:82rem; margin:0 auto}
+.brand{font-family:var(--serif); font-size:1.2rem; font-weight:600; margin-right:auto}
+.brand small{font-family:var(--sans); font-size:.72rem; font-weight:400; color:var(--muted); margin-left:.5rem}
+.seg{display:inline-flex; border:1px solid var(--rule); border-radius:999px; overflow:hidden; background:var(--surface)}
+.seg button{font:inherit; font-size:.82rem; border:0; background:transparent; color:var(--ink); padding:.3rem .8rem; cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink); color:var(--paper)}
+.jauge{display:flex; align-items:center; gap:.5rem; font-size:.8rem; color:var(--muted); font-variant-numeric:tabular-nums}
+.jauge i{display:block; width:7rem; height:6px; background:var(--rule); border-radius:3px; overflow:hidden}
+.jauge b{display:block; height:100%; width:0; background:var(--teal); transition:width .3s}
+
+/* structure */
+.wrap{display:grid; grid-template-columns:17rem minmax(0,1fr); gap:2.5rem; max-width:82rem; margin:0 auto; padding-block:1.5rem 4rem;
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px))}
+nav.som{position:sticky; top:calc(4rem + env(safe-area-inset-top,0px)); align-self:start; max-height:calc(100vh - 5rem); overflow-y:auto; font-size:.86rem; padding-right:.4rem}
+nav.som summary{display:none}
+nav.som .part{margin:1rem 0 .3rem; font-size:.7rem; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); font-weight:600}
+nav.som a{display:flex; gap:.5rem; align-items:baseline; padding:.22rem .5rem; border-left:2px solid transparent; color:var(--ink); text-decoration:none; line-height:1.3}
+nav.som a:hover{background:var(--surface)}
+nav.som a.actif{border-left-color:var(--terra); background:var(--surface); font-weight:500}
+nav.som a .n{font-variant-numeric:tabular-nums; color:var(--muted); min-width:1.3rem}
+nav.som a.fait .n{color:var(--ok)} nav.som a.fait .n::after{content:" ✓"}
+main{min-width:0; max-width:47rem}
+@media (max-width:900px){
+  .wrap{grid-template-columns:minmax(0,1fr); gap:1rem}
+  nav.som{position:static; max-height:none; border:1px solid var(--rule); background:var(--surface); border-radius:6px; padding:.4rem .8rem}
+  nav.som summary{display:block; cursor:pointer; font-weight:600; padding:.3rem 0}
+  .brand small{display:none}
+}
+
+/* en-tête du manuel */
+.couv{padding:1.5rem 0 2rem; border-bottom:2px solid var(--ink)}
+.couv p.chapo{font-family:var(--serif); font-size:1.3rem; line-height:1.4; max-width:40rem}
+.couv .meta{display:flex; flex-wrap:wrap; gap:.4rem 1.5rem; font-size:.84rem; color:var(--muted); margin-top:1rem}
+
+/* modules */
+section.module{padding-top:3.2rem}
+.mod-tete{display:grid; grid-template-columns:auto minmax(0,1fr); gap:0 1.1rem; align-items:start; border-top:2px solid var(--ink); padding-top:.9rem}
+.mod-num{font-family:var(--serif); font-size:3.4rem; line-height:.9; color:var(--terra); font-variant-numeric:lining-nums}
+.mod-info{display:flex; flex-wrap:wrap; gap:.4rem .8rem; align-items:center; margin-top:.5rem; font-size:.8rem; color:var(--muted)}
+.niv{font-size:.72rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase; padding:.12rem .55rem; border-radius:999px; border:1px solid currentColor}
+.niv.socle{color:var(--teal)} .niv.conso{color:var(--ochre)} .niv.appro{color:var(--terra)} .niv.synth{color:var(--ink)}
+.objectifs{margin:1.1rem 0 0; padding:.2rem 0 .2rem 1rem; border-left:3px solid var(--rule)}
+.objectifs ul{margin:.3rem 0}
+.conseil{font-size:.9rem; color:var(--muted); font-style:italic; margin-top:.8rem}
+.conseil::before{content:"Votre parcours — "; font-style:normal; font-weight:600; color:var(--ink)}
+
+/* encadrés : la teinte dit la nature de l'information */
+.box{margin:1.1rem 0; padding:.75rem 1rem; border-radius:4px; background:var(--surface); border:1px solid var(--rule)}
+.box>:first-child{margin-top:0} .box>:last-child{margin-bottom:0}
+.box .t{font-size:.74rem; letter-spacing:.08em; text-transform:uppercase; font-weight:600; margin-bottom:.3rem}
+.box.attention{background:var(--ko-soft); border-color:transparent} .box.attention .t{color:var(--ko)}
+.box.astuce{background:var(--ochre-soft); border-color:transparent} .box.astuce .t{color:var(--ochre)}
+.box.v4{border-style:dashed} .box.v4 .t{color:var(--muted)}
+.metiers{display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:.8rem; margin:1.1rem 0}
+.metiers>div{padding:.75rem 1rem; border-radius:4px; min-width:0}
+.metiers>div>:first-child{margin-top:0} .metiers>div>:last-child{margin-bottom:0}
+.metiers .urb{background:var(--terra-soft)} .metiers .env{background:var(--teal-soft)}
+.metiers .t{font-size:.74rem; letter-spacing:.08em; text-transform:uppercase; font-weight:600}
+.metiers .urb .t{color:var(--terra)} .metiers .env .t{color:var(--teal)}
+
+/* exercices pas à pas */
+.exo{margin:1.6rem 0; border:1px solid var(--ink); border-radius:4px; background:var(--surface)}
+.exo>header{display:flex; flex-wrap:wrap; gap:.3rem 1rem; align-items:baseline; padding:.6rem 1rem; border-bottom:1px solid var(--ink)}
+.exo>header strong{font-family:var(--serif); font-size:1.25rem; font-weight:600}
+.exo>header span{font-size:.8rem; color:var(--muted)}
+.exo>div{padding:.4rem 1rem 1rem}
+ol.pas{list-style:none; padding:0; counter-reset:pas}
+ol.pas>li{counter-increment:pas; display:grid; grid-template-columns:auto minmax(0,1fr); gap:.7rem; padding:.55rem 0; border-top:1px dashed var(--rule); margin:0}
+ol.pas>li:first-child{border-top:0}
+ol.pas>li>label{display:flex; align-items:flex-start; gap:.35rem; font-family:var(--serif); font-size:1.2rem; line-height:1.3; color:var(--terra); cursor:pointer; font-variant-numeric:tabular-nums}
+ol.pas>li>label::after{content:counter(pas)}
+ol.pas>li>label input{margin-top:.45rem; accent-color:var(--teal)}
+ol.pas>li.coche>div{color:var(--muted)}
+ol.pas>li>div>:first-child{margin-top:0} ol.pas>li>div>:last-child{margin-bottom:0}
+.resultat{margin-top:.6rem; padding:.6rem .9rem; background:var(--ok-soft); border-radius:4px; font-size:.93rem}
+.resultat::before{content:"Résultat attendu — "; font-weight:600; color:var(--ok)}
+
+/* captures et vidéos à insérer */
+figure{margin:1.2rem 0}
+figure.capture,figure.video{border:1.5px dashed var(--muted); border-radius:4px; padding:1rem; min-height:6.5rem; display:flex; flex-direction:column; justify-content:center; gap:.2rem; color:var(--muted); font-size:.88rem}
+figure.capture::before{content:"Capture d'écran à insérer"; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; font-weight:600}
+figure.video::before{content:"Tutoriel vidéo à venir"; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; font-weight:600; color:var(--terra)}
+figure.video:has(a){border-style:solid; border-color:var(--terra)} figure.video:has(a)::before{content:"Tutoriel vidéo"}
+figure.video a{font-weight:600}
+figure.capture img{max-width:100%; display:block}
+figure.capture:has(img){border:0; padding:0} figure.capture:has(img)::before{content:none}
+figure.schema{overflow-x:auto}
+figure.schema svg{display:block; width:100%; height:auto; min-width:30rem}
+figcaption{font-size:.84rem; color:var(--muted)}
+figure.schema figcaption{margin-top:.4rem}
+svg text{font-family:var(--sans); fill:var(--ink)}
+svg .s-ink{stroke:var(--ink); fill:none} svg .f-ink{fill:var(--ink)}
+svg .f-surf{fill:var(--surface); stroke:var(--ink)} svg .f-paper{fill:var(--paper); stroke:var(--rule)}
+svg .f-teal{fill:var(--teal-soft); stroke:var(--teal)} svg .f-terra{fill:var(--terra-soft); stroke:var(--terra)}
+svg .f-ochre{fill:var(--ochre-soft); stroke:var(--ochre)}
+svg .t-teal{fill:var(--teal)} svg .t-terra{fill:var(--terra)} svg .t-muted{fill:var(--muted)}
+svg .s-teal{stroke:var(--teal); fill:none} svg .s-terra{stroke:var(--terra); fill:none}
+svg .d-teal{fill:var(--teal)} svg .d-terra{fill:var(--terra)}
+
+/* tableaux */
+.tab{overflow-x:auto; margin:1rem 0}
+table{border-collapse:collapse; width:100%; font-size:.88rem}
+th,td{text-align:left; vertical-align:top; padding:.45rem .6rem; border-bottom:1px solid var(--rule)}
+th{font-size:.74rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); border-bottom:1.5px solid var(--ink); white-space:nowrap}
+td.num{font-variant-numeric:tabular-nums; white-space:nowrap}
+
+/* QCM */
+.qcm{margin:1.6rem 0; padding:1rem; background:var(--surface); border:1px solid var(--rule); border-radius:4px}
+.qcm>.t{font-size:.74rem; letter-spacing:.08em; text-transform:uppercase; font-weight:600; color:var(--teal); display:flex; justify-content:space-between; gap:1rem}
+.qcm .q{margin-top:1rem; padding-top:.9rem; border-top:1px dashed var(--rule)}
+.qcm .q:first-of-type{border-top:0; margin-top:.3rem; padding-top:0}
+.qcm .q>p:first-child{font-weight:500; margin:.2rem 0 .5rem}
+.qcm .q ul{list-style:none; padding:0; margin:0; display:grid; gap:.35rem}
+.qcm .q button{font:inherit; text-align:left; width:100%; padding:.45rem .7rem; border:1px solid var(--rule); background:var(--paper); color:var(--ink); border-radius:4px; cursor:pointer}
+.qcm .q button:hover:not(:disabled){border-color:var(--ink)}
+.qcm .q button.juste{background:var(--ok-soft); border-color:var(--ok)} .qcm .q button.juste::after{content:"  ✓ bonne réponse"; color:var(--ok); font-weight:600; font-size:.85em}
+.qcm .q button.faux{background:var(--ko-soft); border-color:var(--ko)} .qcm .q button.faux::after{content:"  ✗ votre réponse"; color:var(--ko); font-weight:600; font-size:.85em}
+.qcm .q .expl{font-size:.9rem; color:var(--muted); margin:.5rem 0 0}
+.qcm .q:not(.repondu) .expl{display:none}
+
+/* défis, replis */
+details.defi,details.plus{margin:1.1rem 0; border:1px solid var(--rule); border-radius:4px; background:var(--surface)}
+details.defi{border-color:var(--terra)}
+details>summary{cursor:pointer; padding:.6rem 1rem; font-weight:500}
+details.defi>summary::before{content:"Défi — "; color:var(--terra); font-weight:600}
+details.plus>summary::before{content:"Pour aller plus loin — "; color:var(--muted); font-weight:600}
+details>div{padding:0 1rem .8rem}
+.termine{display:flex; flex-wrap:wrap; align-items:center; gap:.8rem; margin-top:2rem; padding-top:1rem; border-top:1px solid var(--rule); font-size:.88rem; color:var(--muted)}
+.btn{font:inherit; font-size:.88rem; font-weight:500; padding:.45rem 1rem; border-radius:999px; border:1.5px solid var(--ink); background:var(--ink); color:var(--paper); cursor:pointer}
+.btn[aria-pressed="true"]{background:var(--ok-soft); color:var(--ok); border-color:var(--ok)}
+.chaine{display:flex; flex-wrap:wrap; gap:.4rem; align-items:center; margin:1rem 0; font-size:.86rem}
+.chaine span{padding:.3rem .6rem; border:1px solid var(--ink); border-radius:4px; background:var(--surface)}
+.chaine i{font-style:normal; color:var(--muted)}
+dl.gloss{display:grid; grid-template-columns:minmax(8rem,12rem) minmax(0,1fr); gap:.5rem 1.2rem; font-size:.93rem}
+dl.gloss dt{font-weight:600} dl.gloss dd{margin:0}
+@media (max-width:560px){dl.gloss{grid-template-columns:minmax(0,1fr); gap:.1rem} dl.gloss dd{margin-bottom:.6rem} .mod-num{font-size:2.4rem}}
+footer.pied{margin-top:4rem; padding-top:1rem; border-top:2px solid var(--ink); font-size:.84rem; color:var(--muted)}
+</style>
+
+<div class="topbar"><div class="topbar-in">
+  <div class="brand">Initiation à la géomatique avec QGIS&nbsp;4.4<small>Master 1 · Ville et environnement urbain · Gestion sociale de l'environnement</small></div>
+  <div class="seg" role="group" aria-label="Votre profil">
+    <button type="button" id="profil-debutant" data-profil="debutant" aria-pressed="true">Je débute</button>
+    <button type="button" id="profil-initie" data-profil="initie" aria-pressed="false">J'ai déjà pratiqué</button>
+  </div>
+  <div class="jauge" aria-live="polite"><i><b id="jauge-b"></b></i><span id="jauge-t">0 / 15 modules</span></div>
+</div></div>
+
+<div class="wrap">
+<nav class="som" aria-label="Sommaire"><details id="som-d" open><summary>Sommaire</summary><div id="som"></div></details></nav>
+<main>
+<!-- =====================================================================
+     POUR MODIFIER CE MANUEL (Notepad++ ou tout éditeur de texte, encodage UTF-8)
+     - Chaque module est une balise <section class="module" id="mN" data-num="N" data-court="titre court">.
+       Le sommaire, la jauge et les boutons « module terminé » sont générés automatiquement.
+     - Capture d'écran : remplacez le contenu d'une balise <figure class="capture"> par
+       <img src="img/nom.png" alt="description"><figcaption>légende</figcaption>
+     - Vidéo : remplacez <figure class="video">…</figure> par un lien <a href="…">Voir le tutoriel</a>.
+     - QCM : la bonne réponse est le <li> portant l'attribut data-ok.
+     - Pas à pas : chaque <li> d'une liste <ol class="pas" id="…"> reçoit une case à cocher (gardez les id uniques).
+     ===================================================================== -->
+
+<section id="accueil" data-num="·" data-court="Avant de commencer" data-partie="Introduction">
+<div class="couv">
+  <p class="eyebrow">Manuel interactif · pas à pas</p>
+  <h1>Initiation à la géomatique avec QGIS&nbsp;4.4</h1>
+  <p class="chapo">Quinze modules progressifs pour apprendre à mobiliser un système d'information géographique au service d'un diagnostic territorial, sur un terrain commun : l'agglomération albigeoise et le département du Tarn.</p>
+  <div class="meta"><span>Version de référence : QGIS 4.4</span><span>Données : open data (IGN, Insee, Géorisques, INPN…)</span><span>Projection : RGF93 / Lambert-93 (EPSG:2154)</span></div>
+</div>
+
+<h2 style="margin-top:2rem">Avant de commencer</h2>
+<figure class="video"><figcaption>Vidéo 0 — Présentation du manuel et de son mode d'emploi.</figcaption></figure>
+
+<h3>Pourquoi un SIG dans vos futurs métiers ?</h3>
+<p>Après Magrit, qui sert à <em>représenter</em> une statistique, et le diagnostic territorial, qui sert à <em>décrire</em> un territoire, QGIS permet de <em>croiser</em> des informations localisées pour répondre à une question d'aménagement ou de gestion. Les questions suivantes, que vous rencontrerez en bureau d'études, en collectivité ou dans un service de l'État, ne peuvent pas recevoir de réponse sans ce croisement spatial.</p>
+<div class="metiers">
+  <div class="urb"><p class="t">Aménagement urbain</p>
+    <ul><li>Quelle part de la population habite à moins de 300&nbsp;m d'un arrêt de bus ?</li>
+    <li>Où subsistent des terrains constructibles non bâtis dans l'enveloppe urbaine ?</li>
+    <li>Combien d'hectares ont été artificialisés depuis dix ans, et pour quel usage ?</li>
+    <li>Un projet de lotissement est-il compatible avec le zonage du PLU et le plan de prévention des risques ?</li></ul></div>
+  <div class="env"><p class="t">Gestion de l'environnement</p>
+    <ul><li>Quels bâtiments et quelles populations sont exposés à la crue du Tarn ?</li>
+    <li>Quelle est l'occupation du sol le long des cours d'eau, et où la ripisylve est-elle interrompue ?</li>
+    <li>Quels secteurs cumulent forte pente et sols nus, donc risque d'érosion ?</li>
+    <li>Un projet intersecte-t-il une ZNIEFF ou un site Natura&nbsp;2000 ?</li></ul></div>
+</div>
+<p>Chaque module se termine par un exercice qui traite l'une de ces questions. Les deux derniers modules sont des études de cas complètes, l'une en aménagement urbain, l'autre en environnement.</p>
+
+<h3>Mode d'emploi</h3>
+<ul>
+  <li><strong>Choisissez votre profil</strong> dans la barre du haut. «&nbsp;Je débute&nbsp;» vous fait suivre tous les modules dans l'ordre. «&nbsp;J'ai déjà pratiqué&nbsp;» vous indique, en tête de chaque module, ce que vous pouvez survoler, et ouvre les <strong>défis</strong>, exercices moins guidés.</li>
+  <li><strong>Les modules 1 à 4 commencent par un test de positionnement.</strong> Si vous répondez juste à toutes les questions, passez directement à l'exercice du module.</li>
+  <li><strong>Cochez les étapes</strong> des exercices au fur et à mesure : votre progression est conservée dans ce navigateur.</li>
+  <li>Les <span class="menu">chemins de menus</span> sont écrits ainsi, les touches du clavier <kbd>Ctrl</kbd>+<kbd>K</kbd> ainsi, et les expressions à saisir <code>"champ" = 'valeur'</code> ainsi.</li>
+  <li>Les cadres en pointillés signalent les captures d'écran et les tutoriels vidéo qui compléteront ce manuel.</li>
+</ul>
+<div class="tab"><table>
+<thead><tr><th>Niveau</th><th>Modules</th><th>Vous saurez…</th></tr></thead>
+<tbody>
+<tr><td><span class="niv socle">Socle</span></td><td class="num">1 à 4</td><td>ouvrir un projet, charger des couches, les interroger et en extraire une partie</td></tr>
+<tr><td><span class="niv conso">Consolidation</span></td><td class="num">5 à 8</td><td>joindre des statistiques, les représenter, produire une carte mise en page, utiliser des flux</td></tr>
+<tr><td><span class="niv appro">Approfondissement</span></td><td class="num">9 à 13</td><td>créer vos propres données, croiser des couches, exploiter le relief, automatiser une chaîne</td></tr>
+<tr><td><span class="niv synth">Synthèse</span></td><td class="num">14 et 15</td><td>conduire une analyse complète et en discuter les limites</td></tr>
+</tbody></table></div>
+
+<h3>Le kit de données</h3>
+<p>Tous les exercices reposent sur des données libres, que vous savez déjà rechercher depuis la séance sur les sources du diagnostic territorial. Le dossier <code>SIG_Albigeois</code> distribué en séance les contient déjà. Le tableau indique leur origine, pour que vous puissiez reconstituer le même kit sur un autre territoire.</p>
+<div class="tab"><table>
+<thead><tr><th>Couche</th><th>Producteur</th><th>Type</th><th>Sert aux modules</th></tr></thead>
+<tbody>
+<tr><td>Communes et EPCI (ADMIN EXPRESS)</td><td><a href="https://cartes.gouv.fr/">IGN, cartes.gouv.fr</a></td><td>Vecteur, polygones</td><td class="num">3 à 7, 11</td></tr>
+<tr><td>BD TOPO du Tarn : bâtiments, routes, cours d'eau, végétation</td><td><a href="https://cartes.gouv.fr/">IGN, cartes.gouv.fr</a></td><td>Vecteur (GeoPackage)</td><td class="num">3, 4, 10, 11, 14, 15</td></tr>
+<tr><td>Modèle numérique de terrain (RGE ALTI)</td><td><a href="https://cartes.gouv.fr/">IGN, cartes.gouv.fr</a></td><td>Raster</td><td class="num">12, 15</td></tr>
+<tr><td>Occupation du sol à grande échelle (OCS GE)</td><td><a href="https://artificialisation.developpement-durable.gouv.fr/">IGN, portail de l'artificialisation</a></td><td>Vecteur, polygones</td><td class="num">11, 15</td></tr>
+<tr><td>Populations communales et indicateurs du recensement</td><td><a href="https://www.insee.fr/fr/statistiques">Insee</a></td><td>Tableau (CSV, XLSX)</td><td class="num">5, 6</td></tr>
+<tr><td>Données carroyées à 200&nbsp;m (Filosofi)</td><td><a href="https://www.insee.fr/fr/statistiques">Insee</a></td><td>Vecteur, carreaux</td><td class="num">11, 14</td></tr>
+<tr><td>Zonages réglementaires et aléas d'inondation</td><td><a href="https://www.georisques.gouv.fr/">Géorisques</a></td><td>Vecteur, polygones</td><td class="num">4, 11, 14</td></tr>
+<tr><td>ZNIEFF, sites Natura 2000</td><td><a href="https://inpn.mnhn.fr/">INPN</a></td><td>Vecteur, polygones</td><td class="num">4, 15</td></tr>
+<tr><td>Zonage du document d'urbanisme</td><td><a href="https://www.geoportail-urbanisme.gouv.fr/">Géoportail de l'urbanisme</a></td><td>Vecteur, polygones</td><td class="num">14</td></tr>
+<tr><td>Parcelles cadastrales</td><td><a href="https://cadastre.data.gouv.fr/">cadastre.data.gouv.fr</a></td><td>Vecteur, polygones</td><td class="num">14</td></tr>
+<tr><td>Arrêts du «&nbsp;Réseau urbain du Grand Albigeois&nbsp;» (fichier GTFS)</td><td><a href="https://transport.data.gouv.fr/">transport.data.gouv.fr</a></td><td>Tableau avec coordonnées</td><td class="num">5, 11, 14</td></tr>
+<tr><td>Photographie aérienne ancienne</td><td><a href="https://remonterletemps.ign.fr/">IGN, Remonter le temps</a></td><td>Image non calée</td><td class="num">9</td></tr>
+</tbody></table></div>
+<div class="box attention"><p class="t">Organisation des fichiers</p>
+<p>Un projet QGIS n'embarque pas les données : il mémorise seulement leur emplacement. Conservez donc la structure suivante, sans espaces ni accents dans les noms, et ne déplacez jamais un fichier isolément.</p>
+<pre>SIG_Albigeois/
+├── 01_donnees_brutes/     données téléchargées, jamais modifiées
+├── 02_donnees_travail/    vos extractions, jointures et résultats
+├── 03_projets/            fichiers .qgz
+└── 04_cartes/             exports PDF et PNG</pre></div>
+</section>
+
+
+<!-- ============================ PARTIE A ============================ -->
+<section class="module" id="m1" data-num="1" data-court="Les notions indispensables" data-partie="A · Socle">
+<div class="mod-tete"><div class="mod-num">1</div><div><h2>Les notions indispensables</h2>
+<div class="mod-info"><span class="niv socle">Socle</span><span>30 min · sans logiciel</span></div></div></div>
+<div class="objectifs"><strong>À la fin de ce module, vous saurez</strong><ul>
+<li>définir un SIG et distinguer une donnée vecteur d'une donnée raster ;</li>
+<li>expliquer ce qu'est un système de coordonnées de référence et pourquoi le Lambert-93 s'impose en France métropolitaine ;</li>
+<li>reconnaître les principaux formats de fichiers.</li></ul></div>
+<p class="conseil" data-debutant="Lisez ce module en entier : il fixe le vocabulaire utilisé dans tout le manuel." data-initie="Faites le test ci-dessous. Sans erreur, passez au module 2 en relisant seulement l'encadré sur le GeoPackage."></p>
+
+<div class="qcm"><p class="t">Test de positionnement</p>
+<div class="q"><p>Un cadastre décrit par des parcelles aux contours nets est une donnée de type…</p>
+<ul><li data-ok>vecteur</li><li>raster</li><li>attributaire</li></ul>
+<p class="expl">Les objets à contour net (parcelles, routes, arrêts de bus) sont décrits par des géométries vectorielles : polygones, lignes, points.</p></div>
+<div class="q"><p>Le code EPSG:2154 désigne…</p>
+<ul><li>le système GPS mondial en degrés</li><li data-ok>le RGF93 / Lambert-93, projection officielle de la France métropolitaine</li><li>la projection des fonds de carte web</li></ul>
+<p class="expl">Le WGS&nbsp;84 en degrés porte le code 4326, la projection des fonds web (Pseudo-Mercator) le code 3857.</p></div>
+<div class="q"><p>Deux couches se superposent mal, avec un décalage de plusieurs centaines de kilomètres. La cause la plus probable est…</p>
+<ul><li>une erreur de numérisation</li><li>un écran mal calibré</li><li data-ok>un système de coordonnées mal déclaré pour l'une des couches</li></ul>
+<p class="expl">QGIS reprojette les couches à la volée, à condition que le système de chacune soit correctement déclaré.</p></div>
+</div>
+
+<h3>Qu'est-ce qu'un SIG ?</h3>
+<p>Un système d'information géographique (SIG) organise, analyse et représente des données localisées. Le terme désigne le logiciel, mais aussi les données, le matériel et les savoir-faire qui l'entourent. Un SIG remplit cinq fonctions, souvent résumées par «&nbsp;les cinq&nbsp;A&nbsp;» : <strong>acquérir</strong> des données, les <strong>archiver</strong>, les <strong>abstraire</strong> (modéliser le réel en objets), les <strong>analyser</strong> pour produire une information nouvelle, et les <strong>afficher</strong> sous forme de cartes.</p>
+<p>Le principe fondamental est la superposition. Parce que toutes les couches sont calées dans un même repère géographique, elles s'empilent comme un mille-feuille, et l'on peut les comparer et les croiser.</p>
+
+<figure class="schema"><svg viewBox="0 0 640 250" role="img" aria-label="Schéma de la superposition des couches dans un SIG">
+<g stroke-width="1.5">
+<polygon class="f-paper" points="150,205 420,205 490,165 220,165"/>
+<polygon class="f-teal" points="150,160 420,160 490,120 220,120"/>
+<polygon class="f-terra" points="150,115 420,115 490,75 220,75"/>
+<polygon class="f-ochre" points="150,70 420,70 490,30 220,30"/>
+</g>
+<path class="s-teal" stroke-width="2" d="M175,150 C250,125 330,160 465,128"/>
+<rect class="d-terra" x="250" y="88" width="16" height="12"/><rect class="d-terra" x="300" y="94" width="20" height="12"/><rect class="d-terra" x="370" y="84" width="14" height="14"/>
+<circle class="f-ink" cx="270" cy="50" r="4"/><circle class="f-ink" cx="340" cy="56" r="4"/><circle class="f-ink" cx="410" cy="44" r="4"/>
+<line class="s-ink" stroke-dasharray="3 3" x1="340" y1="56" x2="340" y2="190"/>
+<text x="500" y="52" font-size="13">Arrêts de bus (points)</text>
+<text x="500" y="98" font-size="13">Bâtiments (polygones)</text>
+<text x="500" y="143" font-size="13">Cours d'eau (lignes)</text>
+<text x="500" y="188" font-size="13">Orthophoto (raster)</text>
+<text x="12" y="120" font-size="12" class="t-muted">Un même lieu,</text><text x="12" y="136" font-size="12" class="t-muted">lu à travers</text><text x="12" y="152" font-size="12" class="t-muted">toutes les couches</text>
+</svg><figcaption>Figure 1.1 — Le «&nbsp;mille-feuille&nbsp;» géographique : des couches indépendantes, superposables parce que géoréférencées.</figcaption></figure>
+
+<h3>Les quatre composantes d'une donnée géographique</h3>
+<ol>
+<li><strong>La géométrie</strong> : la forme et la localisation de l'objet.</li>
+<li><strong>Les attributs</strong> : ce que l'on sait de l'objet (nom, population, nature…), rangé dans une table.</li>
+<li><strong>Le style</strong> : la manière de le dessiner (couleur, épaisseur, symbole).</li>
+<li><strong>Les métadonnées</strong> : la description de la donnée elle-même (producteur, date, méthode, précision). Avant d'utiliser une couche, lisez-les : on ne mesure pas une surface au mètre carré sur une donnée produite au 1/100&nbsp;000.</li>
+</ol>
+
+<h3>Vecteur et raster</h3>
+<figure class="schema"><svg viewBox="0 0 640 210" role="img" aria-label="Comparaison entre le mode vecteur et le mode raster">
+<text x="20" y="22" font-size="14" font-weight="600">Vecteur : des objets</text>
+<rect class="f-surf" x="20" y="34" width="270" height="160"/>
+<polygon class="f-terra" stroke-width="1.5" points="50,70 130,58 150,120 80,140"/>
+<path class="s-teal" stroke-width="2.5" d="M30,170 C90,150 160,185 280,150"/>
+<circle class="f-ink" cx="200" cy="80" r="5"/><circle class="f-ink" cx="240" cy="110" r="5"/>
+<text x="205" y="68" font-size="11" class="t-muted">points</text><text x="60" y="52" font-size="11" class="t-muted">polygone</text><text x="150" y="186" font-size="11" class="t-muted">ligne</text>
+<text x="350" y="22" font-size="14" font-weight="600">Raster : une grille de pixels</text>
+<g stroke="var(--paper)" stroke-width="1">
+<rect x="350" y="34" width="40" height="40" class="d-teal" opacity=".25"/><rect x="390" y="34" width="40" height="40" class="d-teal" opacity=".4"/><rect x="430" y="34" width="40" height="40" class="d-teal" opacity=".55"/><rect x="470" y="34" width="40" height="40" class="d-teal" opacity=".7"/><rect x="510" y="34" width="40" height="40" class="d-teal" opacity=".9"/><rect x="550" y="34" width="40" height="40" class="d-teal" opacity="1"/>
+<rect x="350" y="74" width="40" height="40" class="d-teal" opacity=".2"/><rect x="390" y="74" width="40" height="40" class="d-teal" opacity=".3"/><rect x="430" y="74" width="40" height="40" class="d-teal" opacity=".45"/><rect x="470" y="74" width="40" height="40" class="d-teal" opacity=".6"/><rect x="510" y="74" width="40" height="40" class="d-teal" opacity=".75"/><rect x="550" y="74" width="40" height="40" class="d-teal" opacity=".9"/>
+<rect x="350" y="114" width="40" height="40" class="d-teal" opacity=".1"/><rect x="390" y="114" width="40" height="40" class="d-teal" opacity=".2"/><rect x="430" y="114" width="40" height="40" class="d-teal" opacity=".3"/><rect x="470" y="114" width="40" height="40" class="d-teal" opacity=".45"/><rect x="510" y="114" width="40" height="40" class="d-teal" opacity=".6"/><rect x="550" y="114" width="40" height="40" class="d-teal" opacity=".7"/>
+<rect x="350" y="154" width="40" height="40" class="d-teal" opacity=".05"/><rect x="390" y="154" width="40" height="40" class="d-teal" opacity=".1"/><rect x="430" y="154" width="40" height="40" class="d-teal" opacity=".2"/><rect x="470" y="154" width="40" height="40" class="d-teal" opacity=".3"/><rect x="510" y="154" width="40" height="40" class="d-teal" opacity=".45"/><rect x="550" y="154" width="40" height="40" class="d-teal" opacity=".55"/>
+</g>
+<text x="598" y="58" font-size="11" class="t-muted">312 m</text><text x="598" y="180" font-size="11" class="t-muted">148 m</text>
+</svg><figcaption>Figure 1.2 — À gauche, chaque objet possède une géométrie et une ligne dans la table d'attributs. À droite, chaque pixel porte une valeur (ici une altitude).</figcaption></figure>
+<div class="tab"><table>
+<thead><tr><th></th><th>Vecteur</th><th>Raster</th></tr></thead><tbody>
+<tr><td><strong>Décrit bien</strong></td><td>les objets à limites nettes : parcelles, voirie, réseaux, zonages</td><td>les phénomènes continus : altitude, température, occupation du sol vue du ciel</td></tr>
+<tr><td><strong>Exemples</strong></td><td>BD TOPO, cadastre, zonage du PLU, ZNIEFF</td><td>orthophotographie, modèle numérique de terrain, image satellite, carte ancienne scannée</td></tr>
+<tr><td><strong>Formats courants</strong></td><td>GeoPackage (.gpkg), Shapefile (.shp), GeoJSON</td><td>GeoTIFF (.tif), JPEG&nbsp;2000 (.jp2)</td></tr>
+<tr><td><strong>Limite</strong></td><td>lourd pour décrire un phénomène continu</td><td>la précision dépend de la taille du pixel (résolution)</td></tr>
+</tbody></table></div>
+<div class="box astuce"><p class="t">Quel format choisir ?</p>
+<p>Enregistrez vos résultats en <strong>GeoPackage</strong> : un seul fichier, des noms de champs longs, les accents conservés, plusieurs couches possibles dans le même fichier. Le Shapefile, encore très répandu, impose au moins quatre fichiers solidaires (.shp, .shx, .dbf, .prj) et tronque les noms de champs à dix caractères. Vous devez savoir l'ouvrir, non le produire.</p></div>
+
+<h3>Le système de coordonnées de référence (SCR)</h3>
+<p>Pour que les couches se superposent, il faut un repère commun. Un système de coordonnées de référence associe un modèle de la Terre (le système géodésique) et, le plus souvent, une projection qui met cette surface courbe à plat. Chaque système porte un code dit EPSG.</p>
+<div class="tab"><table>
+<thead><tr><th>Code</th><th>Nom</th><th>Unité</th><th>Où le rencontre-t-on ?</th></tr></thead><tbody>
+<tr><td class="num">EPSG:2154</td><td>RGF93 / Lambert-93</td><td>mètre</td><td>Référence légale en France métropolitaine. <strong>C'est le système de travail de ce manuel.</strong></td></tr>
+<tr><td class="num">EPSG:4326</td><td>WGS 84</td><td>degré</td><td>Coordonnées GPS, fichiers GTFS, GeoJSON</td></tr>
+<tr><td class="num">EPSG:3857</td><td>Pseudo-Mercator</td><td>mètre (déformé)</td><td>Fonds de carte web. Ne jamais y mesurer une distance ou une surface.</td></tr>
+<tr><td class="num">EPSG:27572</td><td>NTF / Lambert II étendu</td><td>mètre</td><td>Données anciennes, antérieures aux années 2000</td></tr>
+</tbody></table></div>
+<p>Retenez la règle suivante : on mesure des distances et des surfaces dans un système projeté en mètres, donc en Lambert-93, jamais en degrés. Le Cerema publie <a href="https://www.cerema.fr/fr/centre-ressources/boutique/georeferencement-rgf93">une série de fiches sur le RGF93 et le Lambert-93</a> pour approfondir.</p>
+<figure class="video"><figcaption>Vidéo 1 — Vecteur, raster, projection : trois notions en cinq minutes.</figcaption></figure>
+</section>
+
+
+<section class="module" id="m2" data-num="2" data-court="Installer QGIS, lire l'interface">
+<div class="mod-tete"><div class="mod-num">2</div><div><h2>Installer QGIS et lire son interface</h2>
+<div class="mod-info"><span class="niv socle">Socle</span><span>45 min</span></div></div></div>
+<div class="objectifs"><strong>À la fin de ce module, vous saurez</strong><ul>
+<li>installer la bonne version de QGIS ;</li><li>nommer les zones de l'interface et retrouver un panneau disparu ;</li>
+<li>naviguer dans la carte et retrouver n'importe quel outil par la barre de localisation.</li></ul></div>
+<p class="conseil" data-debutant="Prenez le temps de manipuler : vous gagnerez ensuite beaucoup de temps." data-initie="Si vous venez d'une version 3.x, lisez l'encadré « Ce qui change avec la série 4 », puis faites l'exercice 2."></p>
+
+<div class="qcm"><p class="t">Test de positionnement</p>
+<div class="q"><p>Le panneau «&nbsp;Couches&nbsp;» a disparu de l'écran. Comment le retrouver ?</p>
+<ul><li>Il faut réinstaller QGIS</li><li data-ok>Menu Vue › Panneaux, ou clic droit sur une barre d'outils</li><li>Menu Projet › Propriétés</li></ul>
+<p class="expl">Tous les panneaux et barres d'outils se réaffichent par <span class="menu">Vue › Panneaux</span> et <span class="menu">Vue › Barres d'outils</span>.</p></div>
+<div class="q"><p>Dans le panneau Couches, la couche placée en haut de la liste est dessinée…</p>
+<ul><li data-ok>au-dessus des autres</li><li>en dessous des autres</li><li>l'ordre n'a aucun effet</li></ul>
+<p class="expl">L'ordre de la liste est l'ordre d'empilement : les polygones opaques se placent en bas, les points et les lignes en haut.</p></div>
+<div class="q"><p>Que signifie le sigle LTR ?</p>
+<ul><li>Une version d'essai limitée dans le temps</li><li>Une version réservée aux professionnels</li><li data-ok>Une version maintenue à long terme, la plus stable</li></ul>
+<p class="expl"><em>Long Term Release</em> : une version corrigée pendant environ un an, à privilégier pour travailler.</p></div>
+</div>
+
+<h3>Quelle version installer ?</h3>
+<p>QGIS est un logiciel libre et gratuit, développé par une communauté internationale, disponible pour Windows, macOS et Linux. Téléchargez-le uniquement sur <a href="https://qgis.org/download/">qgis.org</a>. Deux versions coexistent en permanence :</p>
+<ul>
+<li>la <strong>version à long terme (LTR)</strong>, éprouvée et corrigée régulièrement, à privilégier pour travailler ;</li>
+<li>la <strong>dernière version</strong>, qui apporte les nouveautés mais peut comporter des défauts de jeunesse.</li>
+</ul>
+<div class="box v4"><p class="t">Situation en novembre 2026</p>
+<p>Ce manuel est rédigé pour <strong>QGIS&nbsp;4.4</strong>, publiée le 30&nbsp;octobre 2026 et désignée comme prochaine LTR. Le canal «&nbsp;LTR&nbsp;» du site distribue encore la 3.44 jusqu'en mars&nbsp;2027 : pour obtenir la 4.4, choisissez donc pour l'instant la «&nbsp;dernière version&nbsp;». Les deux versions peuvent être installées côte à côte. Si le poste que vous utilisez est resté en 3.44, tout ce manuel reste applicable : les rares différences sont signalées dans des encadrés en pointillés comme celui-ci.</p></div>
+<div class="box v4"><p class="t">Ce qui change avec la série 4</p>
+<ul>
+<li>Le logiciel repose sur une nouvelle base technique (Qt&nbsp;6). L'organisation des menus et des panneaux est conservée.</li>
+<li>Les projets créés en 3.x s'ouvrent en 4.x. L'inverse n'est pas garanti : ne réenregistrez pas en 4.4 un projet que vous devez rouvrir en 3.44.</li>
+<li>Certaines extensions anciennes n'ont pas encore été adaptées à la série&nbsp;4. Le gestionnaire d'extensions ne propose que celles qui sont compatibles.</li>
+<li>À l'ouverture d'un projet contenant du code (macros, actions), QGIS demande désormais si vous faites confiance au projet. Refusez pour un fichier d'origine inconnue.</li>
+<li>La page d'accueil a été redessinée, et la mise en page gagne de nouveaux éléments (graphiques, options de synchronisation de la légende).</li>
+</ul></div>
+
+<h3>Les zones de l'interface</h3>
+<figure class="schema"><svg viewBox="0 0 640 380" role="img" aria-label="Schéma de l'interface principale de QGIS">
+<rect class="f-surf" x="10" y="10" width="620" height="360" stroke-width="1.5"/>
+<rect class="f-paper" x="10" y="10" width="620" height="24"/><text x="20" y="27" font-size="12">Projet   Éditer   Vue   Couche   Préférences   Extensions   Vecteur   Raster   Traitement</text>
+<rect class="f-paper" x="10" y="34" width="620" height="30"/>
+<g class="f-ink" opacity=".55"><rect x="20" y="42" width="14" height="14"/><rect x="40" y="42" width="14" height="14"/><rect x="60" y="42" width="14" height="14"/><rect x="92" y="42" width="14" height="14"/><rect x="112" y="42" width="14" height="14"/><rect x="132" y="42" width="14" height="14"/><rect x="164" y="42" width="14" height="14"/><rect x="184" y="42" width="14" height="14"/></g>
+<rect class="f-ochre" x="10" y="64" width="150" height="130"/><text x="20" y="84" font-size="12" font-weight="600">Explorateur</text><text x="20" y="104" font-size="11" class="t-muted">Dossiers, GeoPackage,</text><text x="20" y="119" font-size="11" class="t-muted">WMS/WMTS, WFS, XYZ</text>
+<rect class="f-terra" x="10" y="194" width="150" height="148"/><text x="20" y="214" font-size="12" font-weight="600">Couches</text>
+<text x="20" y="236" font-size="11">☑ arrêts de bus</text><text x="20" y="254" font-size="11">☑ cours d'eau</text><text x="20" y="272" font-size="11">☑ bâtiments</text><text x="20" y="290" font-size="11">☑ communes</text><text x="20" y="308" font-size="11">☐ orthophoto</text>
+<rect class="f-teal" x="160" y="64" width="330" height="278"/><text x="172" y="84" font-size="12" font-weight="600">Carte (canevas)</text>
+<path class="s-teal" stroke-width="2" d="M170,300 C240,240 300,300 370,220 S450,160 485,150"/>
+<polygon class="s-ink" points="230,130 320,110 380,170 340,230 250,220 210,180"/>
+<rect class="f-paper" x="490" y="64" width="140" height="278"/><text x="500" y="84" font-size="12" font-weight="600">Boîte à outils</text><text x="500" y="104" font-size="11" class="t-muted">de traitements,</text><text x="500" y="119" font-size="11" class="t-muted">style de couche…</text>
+<rect class="f-paper" x="10" y="342" width="620" height="28"/>
+<rect class="f-surf" x="16" y="347" width="130" height="18"/><text x="22" y="360" font-size="11" class="t-muted">🔍 Localisation (Ctrl+K)</text>
+<text x="170" y="360" font-size="11">Coordonnées 631 200, 6 314 600</text><text x="370" y="360" font-size="11">Échelle 1:25 000</text><text x="548" y="360" font-size="11" font-weight="600">EPSG:2154</text>
+</svg><figcaption>Figure 2.1 — Disposition habituelle. Les panneaux sont déplaçables : la vôtre peut différer.</figcaption></figure>
+<div class="tab"><table><thead><tr><th>Zone</th><th>Rôle</th></tr></thead><tbody>
+<tr><td><strong>Barre des menus</strong></td><td>Toutes les commandes, rangées par famille. Sous macOS, les options se trouvent dans le menu <span class="menu">QGIS › Préférences</span>.</td></tr>
+<tr><td><strong>Barres d'outils</strong></td><td>Raccourcis des commandes les plus fréquentes. Laissez la souris sur une icône pour lire son nom.</td></tr>
+<tr><td><strong>Explorateur</strong></td><td>Parcourt vos dossiers et vos connexions à des services. On y glisse un fichier vers la carte pour le charger.</td></tr>
+<tr><td><strong>Couches</strong></td><td>Liste des couches du projet : visibilité (case à cocher), ordre d'empilement (glisser-déposer), groupes, accès aux propriétés (double-clic).</td></tr>
+<tr><td><strong>Carte</strong></td><td>Affiche les couches cochées. Molette pour zoomer, barre d'espace maintenue ou clic sur la molette pour se déplacer.</td></tr>
+<tr><td><strong>Barre d'état</strong></td><td>Coordonnées du curseur, échelle, et bouton du SCR du projet en bas à droite.</td></tr>
+<tr><td><strong>Barre de localisation</strong></td><td>En bas à gauche (<kbd>Ctrl</kbd>+<kbd>K</kbd>). Tapez quelques lettres pour trouver un outil, une couche ou une entité.</td></tr>
+</tbody></table></div>
+<figure class="capture"><figcaption>Capture 2.1 — Fenêtre principale de QGIS 4.4 avec le projet Albigeois ouvert, zones annotées.</figcaption></figure>
+<div class="box astuce"><p class="t">Trois réflexes</p><ul>
+<li><kbd>Ctrl</kbd>+<kbd>K</kbd> puis le nom d'un outil («&nbsp;tampon&nbsp;», «&nbsp;jointure&nbsp;») : vous n'avez pas à mémoriser les menus.</li>
+<li>Clic droit sur une couche › <span class="menu">Zoomer sur la couche</span> : pour retrouver une couche «&nbsp;perdue&nbsp;».</li>
+<li><kbd>Ctrl</kbd>+<kbd>Tab</kbd> masque tous les panneaux pour ne garder que la carte.</li></ul></div>
+
+<div class="exo"><header><strong>Exercice 2 — Prendre l'interface en main</strong><span>15 min</span></header><div>
+<ol class="pas" id="ex2">
+<li>Lancez QGIS. Sur la page d'accueil, créez un projet vide : <span class="menu">Projet › Nouveau</span> (<kbd>Ctrl</kbd>+<kbd>N</kbd>).</li>
+<li>Fermez volontairement le panneau Couches avec sa croix, puis réaffichez-le par <span class="menu">Vue › Panneaux › Couches</span>.</li>
+<li>Dans l'Explorateur, dépliez <strong>XYZ Tiles</strong> et double-cliquez sur <strong>OpenStreetMap</strong>. Un fond de carte mondial s'affiche.</li>
+<li>Zoomez sur Albi à la molette. Observez l'échelle et les coordonnées qui changent dans la barre d'état.</li>
+<li>Tapez <kbd>Ctrl</kbd>+<kbd>K</kbd>, saisissez <code>mesure</code>, et lancez l'outil de mesure de ligne. Mesurez la longueur du Pont-Vieux.</li>
+<li>Ouvrez <span class="menu">Préférences › Options › SCR et transformations</span> et choisissez EPSG:2154 comme SCR par défaut des nouveaux projets.</li>
+</ol>
+<p class="resultat">Le Pont-Vieux mesure un peu plus de 150&nbsp;m. Si vous trouvez une valeur très différente, vérifiez que vous mesurez bien d'une rive à l'autre.</p>
+</div></div>
+<figure class="video"><figcaption>Vidéo 2 — Tour de l'interface et personnalisation des panneaux.</figcaption></figure>
+</section>
+
+
+<section class="module" id="m3" data-num="3" data-court="Le projet et les couches">
+<div class="mod-tete"><div class="mod-num">3</div><div><h2>Créer un projet et charger des couches</h2>
+<div class="mod-info"><span class="niv socle">Socle</span><span>1 h</span></div></div></div>
+<div class="objectifs"><strong>À la fin de ce module, vous saurez</strong><ul>
+<li>créer, enregistrer et rouvrir un projet sans perdre vos couches ;</li>
+<li>charger des couches vecteur et raster ;</li><li>lire une table d'attributs et les propriétés d'une couche.</li></ul></div>
+<p class="conseil" data-debutant="Ce module construit le projet que vous utiliserez jusqu'à la fin du manuel : suivez l'exercice pas à pas." data-initie="Faites directement l'exercice 3, puis le défi sur les chemins relatifs."></p>
+
+<div class="qcm"><p class="t">Test de positionnement</p>
+<div class="q"><p>Vous envoyez à une collègue votre seul fichier <code>diagnostic.qgz</code>. Que voit-elle à l'ouverture ?</p>
+<ul><li>La carte complète</li><li data-ok>Un message signalant des couches introuvables</li><li>Les couches, mais sans leurs couleurs</li></ul>
+<p class="expl">Le projet contient les styles et les chemins d'accès, non les données. Il faut transmettre le dossier complet.</p></div>
+<div class="q"><p>Quel fichier faut-il ouvrir pour charger un Shapefile ?</p>
+<ul><li>le .dbf</li><li>le .prj</li><li data-ok>le .shp</li></ul>
+<p class="expl">Le .shp contient les géométries ; les autres fichiers, de même nom, doivent rester dans le même dossier.</p></div>
+<div class="q"><p>Dans une table d'attributs, une ligne correspond à…</p>
+<ul><li data-ok>une entité géographique</li><li>un champ</li><li>une couche</li></ul>
+<p class="expl">Une ligne par entité (une commune, un bâtiment), une colonne par champ (nom, population).</p></div>
+</div>
+
+<h3>Le projet</h3>
+<p>Le projet (fichier <code>.qgz</code>) enregistre l'état de votre travail : liste des couches et leur emplacement, styles, étiquettes, jointures, filtres, SCR, emprise affichée et mises en page. Il n'enregistre pas les données elles-mêmes. C'est la différence essentielle avec Magrit, où le projet embarque tout.</p>
+<div class="box attention"><p class="t">Deux précautions</p><ul>
+<li>Enregistrez souvent (<kbd>Ctrl</kbd>+<kbd>S</kbd>). QGIS peut se fermer inopinément lors d'un traitement lourd.</li>
+<li>Vérifiez dans <span class="menu">Projet › Propriétés › Général</span> que les chemins sont enregistrés en <strong>relatif</strong> : le dossier <code>SIG_Albigeois</code> peut alors être déplacé ou copié sur une clé sans rompre les liens.</li></ul></div>
+
+<h3>Charger des couches</h3>
+<p>Trois voies mènent au même résultat.</p>
+<ul>
+<li><strong>L'Explorateur</strong> : glissez le fichier vers la carte ou double-cliquez dessus. Un GeoPackage se déplie pour montrer les couches qu'il contient. C'est la voie la plus rapide.</li>
+<li><strong>Le gestionnaire des sources de données</strong> (<kbd>Ctrl</kbd>+<kbd>L</kbd>, ou <span class="menu">Couche › Ajouter une couche</span>) : une fenêtre unique avec un onglet par type de source (vecteur, raster, texte délimité, WMS/WMTS, WFS…). Elle donne accès aux options, par exemple l'encodage : si les accents s'affichent mal, essayez UTF-8 puis ISO-8859-1.</li>
+<li><strong>Le glisser-déposer</strong> depuis l'explorateur de fichiers de votre ordinateur.</li>
+</ul>
+<div class="box attention"><p class="t">Exception</p><p>N'ouvrez jamais un fichier CSV ou TXT par l'Explorateur : vous n'auriez pas accès aux réglages indispensables (séparateur, type des champs). La procédure correcte est décrite au module&nbsp;5.</p></div>
+
+<h3>Lire une couche : propriétés et table d'attributs</h3>
+<p>Un double-clic sur le nom d'une couche ouvre ses <strong>propriétés</strong>. Les onglets utiles au début sont <em>Information</em> (SCR, nombre d'entités, emprise), <em>Source</em>, <em>Symbologie</em>, <em>Étiquettes</em>, <em>Champs</em> et <em>Jointures</em> pour un vecteur ; <em>Symbologie</em> et <em>Transparence</em> pour un raster.</p>
+<p>La <strong>table d'attributs</strong> s'ouvre par clic droit › <span class="menu">Ouvrir la table d'attributs</span> ou <kbd>F6</kbd>. Un clic sur un en-tête de colonne trie la table. Le nombre d'entités figure dans le titre de la fenêtre.</p>
+<figure class="capture"><figcaption>Capture 3.1 — Table d'attributs de la couche des communes, avec le bouton de bascule entre vue tableau et vue formulaire.</figcaption></figure>
+
+<div class="exo"><header><strong>Exercice 3 — Construire le projet Albigeois</strong><span>30 min · fil rouge du manuel</span></header><div>
+<ol class="pas" id="ex3">
+<li>Créez un projet et enregistrez-le aussitôt sous <code>03_projets/albigeois.qgz</code> (<span class="menu">Projet › Enregistrer sous…</span>).</li>
+<li>Cliquez sur le bouton du SCR en bas à droite et choisissez <strong>EPSG:2154</strong> (tapez <code>2154</code> dans le filtre).</li>
+<li>Dans l'Explorateur, clic droit sur le dossier <code>SIG_Albigeois</code> › <span class="menu">Ajouter aux marque-pages</span>. Il sera désormais accessible en un clic.</li>
+<li>Chargez la couche des <strong>communes</strong> (ADMIN EXPRESS), puis, depuis le GeoPackage de la BD TOPO, les couches <strong>batiment</strong>, <strong>troncon_de_route</strong> et <strong>cours_d_eau</strong>.</li>
+<li>Réordonnez les couches : communes en bas, puis bâtiments, routes et cours d'eau.</li>
+<li>Sélectionnez les trois couches de la BD TOPO (<kbd>Ctrl</kbd>+clic), puis clic droit › <span class="menu">Grouper la sélection</span>. Nommez le groupe «&nbsp;BD TOPO&nbsp;».</li>
+<li>Ouvrez les propriétés de la couche des communes, onglet <em>Information</em> : relevez le SCR et le nombre d'entités.</li>
+<li>Ouvrez sa table d'attributs. Repérez le champ du code Insee, celui du nom et celui de la population. Triez par population décroissante.</li>
+<li>Enregistrez le projet.</li>
+</ol>
+<p class="resultat">Le Tarn compte un peu plus de 300 communes, Albi et Castres en tête pour la population. Les couches se superposent exactement : si ce n'est pas le cas, contrôlez le SCR de chaque couche dans ses propriétés.</p>
+<div class="box"><p class="t">Noms de champs</p><p>Les noms de champs changent selon le millésime des données. Dans ADMIN EXPRESS, le code Insee s'appelle <code>INSEE_COM</code> dans les versions anciennes et <code>code_insee</code> dans les plus récentes. Dans la suite du manuel, adaptez les expressions aux noms que vous lisez dans votre table.</p></div>
+</div></div>
+
+<details class="defi"><summary>Rendre le projet transportable</summary><div>
+<p>Copiez le dossier <code>SIG_Albigeois</code> sur une clé USB ou un autre emplacement, ouvrez-y le projet et vérifiez qu'aucune couche n'est signalée manquante. Déplacez ensuite volontairement un fichier de données, rouvrez le projet et réparez le lien dans la fenêtre «&nbsp;Gérer les couches indisponibles&nbsp;». Quelle option des propriétés du projet rend la première manipulation possible ?</p>
+</div></details>
+<figure class="video"><figcaption>Vidéo 3 — Créer le projet, charger et organiser les couches.</figcaption></figure>
+</section>
+
+
+<section class="module" id="m4" data-num="4" data-court="Interroger et sélectionner">
+<div class="mod-tete"><div class="mod-num">4</div><div><h2>Interroger et sélectionner</h2>
+<div class="mod-info"><span class="niv socle">Socle</span><span>1 h 30</span></div></div></div>
+<div class="objectifs"><strong>À la fin de ce module, vous saurez</strong><ul>
+<li>consulter les attributs d'un objet ;</li>
+<li>sélectionner des entités à la souris, par leurs attributs et par leur position relative à une autre couche ;</li>
+<li>enregistrer une sélection dans une nouvelle couche.</li></ul></div>
+<p class="conseil" data-debutant="La sélection est le geste le plus fréquent en SIG. Refaites les exemples jusqu'à ce qu'ils deviennent naturels." data-initie="Vérifiez vos acquis sur les prédicats spatiaux avec le test, puis faites l'exercice 4 et le défi."></p>
+
+<div class="qcm"><p class="t">Test de positionnement</p>
+<div class="q"><p>Quelle expression sélectionne les communes du Tarn dont le nom commence par «&nbsp;CAS&nbsp;» ?</p>
+<ul><li><code>"NOM" = 'CAS' AND "INSEE_DEP" = 81</code></li><li data-ok><code>"NOM" LIKE 'CAS%' AND "INSEE_DEP" = '81'</code></li><li><code>'NOM' LIKE "CAS%" OR 'INSEE_DEP' = "81"</code></li></ul>
+<p class="expl">Guillemets doubles pour les champs, apostrophes pour les textes, <code>%</code> pour «&nbsp;n'importe quelle suite de caractères&nbsp;». Un code de département est un texte, non un nombre.</p></div>
+<div class="q"><p>Pour sélectionner les bâtiments situés dans une zone inondable, on utilise…</p>
+<ul><li>une sélection par valeur</li><li>une jointure attributaire</li><li data-ok>une sélection par localisation</li></ul>
+<p class="expl">Le critère est une relation spatiale entre deux couches, non une valeur d'attribut.</p></div>
+<div class="q"><p>Deux communes voisines partagent une limite. Le prédicat spatial qui décrit cette relation est…</p>
+<ul><li>chevauche</li><li data-ok>touche</li><li>croise</li></ul>
+<p class="expl">Elles se touchent : leurs limites ont des points communs, leurs intérieurs aucun.</p></div>
+</div>
+
+<h3>Identifier un objet</h3>
+<p>Sélectionnez la couche dans le panneau Couches, activez l'outil <strong>Identifier les entités</strong> (<kbd>Ctrl</kbd>+<kbd>Maj</kbd>+<kbd>I</kbd>) et cliquez sur un objet. Le panneau de résultats affiche des informations dérivées de la géométrie (surface, périmètre, coordonnées) et les attributs. Le menu <em>Mode</em>, en bas du panneau, règle les couches interrogées : couche active, de haut en bas en s'arrêtant à la première réponse, de haut en bas sans s'arrêter, ou choix à chaque clic.</p>
+
+<h3>Sélectionner à la souris</h3>
+<p>Les entités sélectionnées apparaissent en jaune sur la carte et en bleu dans la table. L'outil de sélection propose quatre formes : rectangle ou clic, polygone, tracé à main levée, cercle.</p>
+<div class="tab"><table><thead><tr><th>Touche maintenue</th><th>Effet</th></tr></thead><tbody>
+<tr><td><kbd>Maj</kbd></td><td>ajoute à la sélection</td></tr>
+<tr><td><kbd>Ctrl</kbd></td><td>retire de la sélection</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>Maj</kbd></td><td>conserve l'intersection avec la sélection précédente</td></tr>
+<tr><td><kbd>Alt</kbd></td><td>ne retient que les entités entièrement contenues dans la forme tracée</td></tr>
+</tbody></table></div>
+<p>La sélection est propre à chaque couche : changer de couche active ne désélectionne rien. Pour tout désélectionner dans toutes les couches, utilisez <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>A</kbd>.</p>
+
+<h3>Sélectionner par les attributs</h3>
+<p><strong>Par valeur</strong> (<kbd>F3</kbd>) : un formulaire présente tous les champs. Saisissez une valeur, choisissez l'opérateur dans la liste à droite (égal à, contient, supérieur à, non renseigné…), puis <em>Sélectionner les entités</em>. Plusieurs champs remplis se cumulent.</p>
+<p><strong>Par expression</strong> (<kbd>Ctrl</kbd>+<kbd>F3</kbd>) : plus souple, et réutilisable dans les filtres, la calculatrice de champ et les étiquettes.</p>
+<div class="tab"><table><thead><tr><th>Question</th><th>Expression</th></tr></thead><tbody>
+<tr><td>Communes de la communauté d'agglomération de l'Albigeois</td><td><code>"SIREN_EPCI" = '248100737'</code></td></tr>
+<tr><td>Communes de plus de 5&nbsp;000 habitants</td><td><code>"POPULATION" &gt; 5000</code></td></tr>
+<tr><td>Communes entre 2&nbsp;000 et 10&nbsp;000 habitants</td><td><code>"POPULATION" &gt;= 2000 AND "POPULATION" &lt; 10000</code></td></tr>
+<tr><td>Bâtiments industriels ou agricoles</td><td><code>"usage_1" IN ('Industriel', 'Agricole')</code></td></tr>
+<tr><td>Communes dont le nom contient «&nbsp;Tarn&nbsp;»</td><td><code>"NOM" ILIKE '%tarn%'</code></td></tr>
+<tr><td>Bâtiments dont la hauteur n'est pas renseignée</td><td><code>"hauteur" IS NULL</code></td></tr>
+</tbody></table></div>
+<div class="box astuce"><p class="t">Filtrer plutôt que sélectionner</p><p>Pour ne plus afficher que certaines entités d'une couche volumineuse, clic droit › <span class="menu">Filtrer…</span> et saisissez la même expression. Les autres entités ne sont pas supprimées, seulement ignorées, et les traitements ne portent plus que sur les entités filtrées. Un entonnoir apparaît à côté du nom de la couche.</p></div>
+
+<h3>Sélectionner par localisation</h3>
+<p>L'outil <span class="menu">Vecteur › Outils de recherche › Sélection par localisation</span> demande trois choses : la couche dans laquelle sélectionner, le ou les prédicats géométriques, et la couche de comparaison. Si la comparaison ne doit porter que sur certains objets, sélectionnez-les au préalable et cochez <em>Entités sélectionnées uniquement</em>.</p>
+
+<figure class="schema"><svg viewBox="0 0 640 300" role="img" aria-label="Les huit prédicats spatiaux illustrés">
+<g font-size="12.5" font-weight="600">
+<text x="14" y="20">Intersecte</text><text x="174" y="20">Est à l'intérieur</text><text x="334" y="20">Contient</text><text x="494" y="20">Est disjoint</text>
+<text x="14" y="170">Touche</text><text x="174" y="170">Chevauche</text><text x="334" y="170">Croise</text><text x="494" y="170">Est égal</text></g>
+<g stroke-width="1.5">
+<rect class="f-teal" x="14" y="38" width="80" height="60"/><rect class="f-terra" x="64" y="68" width="70" height="50" opacity=".85"/>
+<rect class="f-teal" x="174" y="38" width="120" height="90"/><rect class="f-terra" x="204" y="62" width="50" height="40"/>
+<rect class="f-terra" x="334" y="38" width="120" height="90"/><rect class="f-teal" x="364" y="62" width="50" height="40"/>
+<rect class="f-teal" x="494" y="38" width="55" height="50"/><rect class="f-terra" x="572" y="78" width="55" height="50"/>
+<rect class="f-teal" x="14" y="188" width="60" height="70"/><rect class="f-terra" x="74" y="208" width="60" height="70"/>
+<rect class="f-teal" x="174" y="188" width="80" height="60"/><rect class="f-terra" x="224" y="218" width="70" height="60" opacity=".85"/>
+<rect class="f-teal" x="364" y="198" width="70" height="70"/><path class="s-terra" stroke-width="3" d="M334,275 L460,190"/>
+<rect class="f-teal" x="494" y="188" width="90" height="70"/><rect class="s-terra" stroke-dasharray="5 4" stroke-width="2.5" x="494" y="188" width="90" height="70"/>
+</g>
+<g font-size="11" class="t-muted">
+<text x="14" y="136">au moins un point commun</text><text x="174" y="146">entièrement dans l'autre</text><text x="334" y="146">englobe l'autre</text><text x="494" y="146">aucun point commun</text>
+<text x="14" y="294">limites en contact seulement</text><text x="174" y="294">recouvrement partiel</text><text x="334" y="294">une ligne traverse</text><text x="494" y="276">géométries identiques</text></g>
+</svg><figcaption>Figure 4.1 — Les huit prédicats conformes à la norme OGC. En orange, l'entité testée ; en bleu-vert, l'entité de comparaison.</figcaption></figure>
+<div class="tab"><table><thead><tr><th>Prédicat</th><th>Définition</th><th>Exemple de question</th></tr></thead><tbody>
+<tr><td><strong>Intersecte</strong></td><td>Les géométries ont au moins un point commun. C'est le plus large.</td><td>Quelles parcelles sont concernées, même partiellement, par la zone inondable ?</td></tr>
+<tr><td><strong>Est à l'intérieur</strong></td><td>Toute la géométrie est dans l'autre.</td><td>Quels bâtiments sont entièrement en zone inondable ?</td></tr>
+<tr><td><strong>Contient</strong></td><td>Inverse du précédent.</td><td>Quelles communes contiennent une gare ?</td></tr>
+<tr><td><strong>Est disjoint</strong></td><td>Aucun point commun.</td><td>Quelles parcelles ne portent aucun bâtiment ?</td></tr>
+<tr><td><strong>Touche</strong></td><td>Les limites se rejoignent, non les intérieurs.</td><td>Quelles communes sont limitrophes d'Albi ?</td></tr>
+<tr><td><strong>Chevauche</strong></td><td>Recouvrement partiel entre objets de même type.</td><td>Quelles ZNIEFF débordent sur un site Natura 2000 ?</td></tr>
+<tr><td><strong>Croise</strong></td><td>Une ligne traverse un polygone ou une autre ligne.</td><td>Quelles routes franchissent le Tarn ?</td></tr>
+<tr><td><strong>Est égal</strong></td><td>Géométries identiques.</td><td>Recherche de doublons.</td></tr>
+</tbody></table></div>
+<div class="box attention"><p class="t">Des résultats parfois surprenants</p><p>Deux couches issues de producteurs différents n'ont jamais exactement les mêmes limites. Une commune peut ainsi «&nbsp;intersecter&nbsp;» un EPCI voisin sur quelques mètres. Avant de conclure, contrôlez visuellement le résultat, et préférez si besoin un test sur le centroïde des entités.</p></div>
+
+<h3>Enregistrer une sélection</h3>
+<p>Clic droit sur la couche › <span class="menu">Exporter › Sauvegarder les entités sélectionnées sous…</span>. Choisissez le format GeoPackage, un nom de fichier dans <code>02_donnees_travail</code>, le SCR EPSG:2154, et laissez cochée l'option d'ajout au projet. La même fenêtre, sans sélection, sert à convertir une couche d'un format ou d'un SCR à un autre.</p>
+
+<div class="exo"><header><strong>Exercice 4 — Délimiter le terrain d'étude et repérer le bâti exposé</strong><span>40 min</span></header><div>
+<ol class="pas" id="ex4">
+<li>Sur la couche des communes, ouvrez la sélection par expression (<kbd>Ctrl</kbd>+<kbd>F3</kbd>) et sélectionnez les communes dont le code SIREN de l'EPCI vaut <code>248100737</code>.</li>
+<li>Ouvrez la table d'attributs et affichez seulement la sélection (liste déroulante en bas à gauche). Comptez les communes.</li>
+<li>Exportez la sélection en GeoPackage sous le nom <code>c2a_communes.gpkg</code>. Désélectionnez tout.</li>
+<li>Avec l'outil Identifier, cliquez sur Albi : relevez sa population et sa surface.</li>
+<li>Chargez la couche des zones inondables (Géorisques). Placez-la sous les bâtiments et donnez-lui un bleu semi-transparent (double-clic › Symbologie › Opacité).</li>
+<li>Lancez <span class="menu">Vecteur › Outils de recherche › Sélection par localisation</span> : sélectionner dans <em>batiment</em> les entités qui <em>intersectent</em> la couche des zones inondables.</li>
+<li>Relevez le nombre de bâtiments sélectionnés, affiché dans la barre d'état. Recommencez avec le prédicat <em>est à l'intérieur</em> et comparez.</li>
+<li>Exportez la sélection sous <code>bati_zone_inondable.gpkg</code>. Enregistrez le projet.</li>
+</ol>
+<p class="resultat">La communauté d'agglomération de l'Albigeois compte 16 communes. Le nombre de bâtiments «&nbsp;à l'intérieur&nbsp;» est inférieur au nombre de bâtiments qui «&nbsp;intersectent&nbsp;» : l'écart correspond aux bâtiments à cheval sur la limite de la zone. Lequel des deux chiffres communiqueriez-vous à un élu, et avec quelle précaution ?</p>
+</div></div>
+<div class="metiers">
+<div class="urb"><p class="t">Aménagement urbain</p><p>Vérifier la compatibilité d'un projet avec un zonage réglementaire commence toujours par une sélection par localisation : parcelles du projet contre zonage du PLU, périmètre de protection d'un monument historique, servitudes.</p></div>
+<div class="env"><p class="t">Environnement</p><p>La même opération identifie les enjeux exposés à un aléa (inondation, feu de forêt, retrait-gonflement des argiles) ou les projets situés dans un espace protégé, première étape d'une évaluation environnementale.</p></div>
+</div>
+<details class="defi"><summary>Trois requêtes sans guidage</summary><div><ol>
+<li>Quelles communes de l'agglomération sont limitrophes d'Albi ?</li>
+<li>Quels tronçons de route franchissent un cours d'eau ? Combien dans l'agglomération ?</li>
+<li>Combien de bâtiments de plus de 15&nbsp;m de hauteur se trouvent en zone inondable ? Combinez une expression et une sélection par localisation en utilisant l'option «&nbsp;sélectionner depuis la sélection existante&nbsp;».</li></ol></div></details>
+<figure class="video"><figcaption>Vidéo 4 — Sélection par expression et par localisation.</figcaption></figure>
+</section>
+<!-- ============================ PARTIE B ============================ -->
+<section class="module" id="m5" data-num="5" data-court="Tableaux, jointures, calculs" data-partie="B · Consolidation">
+<div class="mod-tete"><div class="mod-num">5</div><div><h2>Importer des tableaux, joindre et calculer</h2>
+<div class="mod-info"><span class="niv conso">Consolidation</span><span>1 h 30</span></div></div></div>
+<div class="objectifs"><strong>À la fin de ce module, vous saurez</strong><ul>
+<li>importer correctement un tableur ou un fichier CSV ;</li>
+<li>transformer un tableau de coordonnées en couche de points ;</li>
+<li>joindre des statistiques à un fond de carte et diagnostiquer une jointure qui échoue ;</li>
+<li>créer un nouvel indicateur avec la calculatrice de champ.</li></ul></div>
+<p class="conseil" data-debutant="Vous connaissez la jointure depuis Magrit. La différence est qu'ici vous contrôlez chaque étape." data-initie="Concentrez-vous sur la calculatrice de champ et sur le diagnostic des jointures défaillantes."></p>
+
+<h3>Préparer le tableau</h3>
+<p>Les couches géographiques contiennent rarement toutes les variables utiles à un diagnostic. On leur rattache donc des tableaux statistiques, le plus souvent issus de l'Insee, grâce à un identifiant commun : le code Insee de la commune, le code IRIS, le numéro de parcelle. Avant l'import, vérifiez trois points dans LibreOffice Calc :</p>
+<ul>
+<li><strong>la première ligne contient les noms des colonnes</strong>, courts, sans accents ni espaces. Supprimez les lignes de titre et de notes que l'Insee place au-dessus ;</li>
+<li><strong>l'identifiant est au format texte</strong>. Un code Insee stocké comme un nombre perd son zéro initial (<code>01004</code> devient <code>1004</code>) et la jointure échoue pour tous les départements de 01 à 09 ;</li>
+<li><strong>une ligne par entité</strong>, sans ligne de total ni cellule fusionnée.</li>
+</ul>
+
+<h3>Importer un tableur ou un fichier texte</h3>
+<p><strong>Tableur (XLSX, ODS)</strong> : glissez le fichier depuis l'Explorateur. Si le classeur comporte plusieurs feuilles, QGIS demande laquelle ouvrir. Contrôlez l'import en ouvrant la table. Si la première ligne n'a pas été reconnue comme en-tête, enregistrez la feuille en CSV et utilisez la procédure suivante.</p>
+<p><strong>Texte délimité (CSV, TXT)</strong> : passez obligatoirement par <span class="menu">Couche › Ajouter une couche › Ajouter une couche de texte délimité…</span></p>
+<ol>
+<li>Désignez le fichier et vérifiez l'encodage (UTF-8 le plus souvent ; ISO-8859-1 si les accents sont illisibles).</li>
+<li>Choisissez le séparateur. Les fichiers français utilisent en général le point-virgule, puisque la virgule sert de séparateur décimal ; les fichiers anglo-saxons utilisent la virgule. L'aperçu, en bas de la fenêtre, doit montrer des colonnes bien séparées.</li>
+<li>Contrôlez le type détecté sous chaque nom de colonne et corrigez-le si nécessaire : l'identifiant doit être de type <em>Texte</em>.</li>
+<li>Dans <em>Définition de la géométrie</em>, cochez <em>Pas de géométrie</em> pour un tableau statistique, ou <em>Coordonnées de point</em> si le fichier contient des colonnes X et Y.</li>
+<li>Cliquez sur <em>Ajouter</em>.</li>
+</ol>
+<figure class="capture"><figcaption>Capture 5.1 — Fenêtre d'import de texte délimité : séparateur, types de champs et aperçu.</figcaption></figure>
+<div class="box astuce"><p class="t">Un tableau de coordonnées devient une couche</p><p>Le fichier <code>stops.txt</code> d'un jeu GTFS liste les arrêts d'un réseau de transport avec leurs coordonnées. Importez-le en texte délimité, séparateur virgule, géométrie <em>Coordonnées de point</em>, champ X <code>stop_lon</code>, champ Y <code>stop_lat</code>, SCR <strong>EPSG:4326</strong> puisque ce sont des degrés. Exportez ensuite la couche en GeoPackage en EPSG:2154 pour pouvoir mesurer des distances.</p></div>
+
+<h3>La jointure attributaire</h3>
+<p>Ouvrez les propriétés de la <strong>couche géographique</strong>, onglet <em>Jointures</em>, et cliquez sur le bouton <strong>+</strong>.</p>
+<ol>
+<li><em>Joindre la couche</em> : le tableau importé.</li>
+<li><em>Champ de jointure</em> : l'identifiant dans le tableau.</li>
+<li><em>Champ dans la couche cible</em> : l'identifiant dans la couche géographique.</li>
+<li>Facultatif : cochez <em>Champs joints</em> pour ne retenir que les colonnes utiles.</li>
+<li>Recommandé : cochez <em>Préfixe de nom de champ personnalisé</em> et saisissez un préfixe court, par exemple <code>rp_</code>, ou videz-le.</li>
+</ol>
+<p>Les colonnes du tableau apparaissent à droite de la table d'attributs. Une entité sans correspondance reçoit la valeur <code>NULL</code>.</p>
+<div class="box attention"><p class="t">La jointure est un lien, non une copie</p><p>Les colonnes jointes n'existent que dans le projet. Pour les inscrire définitivement dans la couche, exportez-la (<span class="menu">Exporter › Sauvegarder les entités sous…</span>) : le fichier produit contient les géométries et les colonnes jointes.</p></div>
+<div class="tab"><table><thead><tr><th>Symptôme</th><th>Cause probable</th><th>Remède</th></tr></thead><tbody>
+<tr><td>Toutes les valeurs sont NULL</td><td>Identifiants de types différents (texte d'un côté, nombre de l'autre)</td><td>Réimporter le tableau en forçant le type Texte</td></tr>
+<tr><td>NULL pour quelques communes</td><td>Géographies de millésimes différents : fusions de communes entre les deux dates</td><td>Utiliser le fond de carte du même millésime que les statistiques</td></tr>
+<tr><td>NULL pour les codes commençant par 0</td><td>Zéro initial perdu dans le tableur</td><td>Reformater la colonne en texte avant l'export</td></tr>
+<tr><td>Les nombres sont alignés à gauche et les calculs échouent</td><td>Champ numérique lu comme du texte (virgule décimale, espaces)</td><td>Corriger le type à l'import, ou convertir avec <code>to_real()</code></td></tr>
+</tbody></table></div>
+
+<h3>La calculatrice de champ</h3>
+<p>La calculatrice (<kbd>Ctrl</kbd>+<kbd>I</kbd> depuis la table d'attributs) crée ou met à jour un champ à partir d'une expression. Donnez un nom au champ, choisissez son type (nombre décimal pour un taux ou une densité) et composez l'expression. L'aperçu du résultat pour la première entité s'affiche sous la zone de saisie.</p>
+<div class="tab"><table><thead><tr><th>Indicateur</th><th>Expression</th></tr></thead><tbody>
+<tr><td>Surface en hectares</td><td><code>$area / 10000</code></td></tr>
+<tr><td>Densité de population (hab./km²)</td><td><code>"POPULATION" / ($area / 1000000)</code></td></tr>
+<tr><td>Taux d'évolution entre deux recensements (%)</td><td><code>round(("pop_2022" - "pop_2016") / "pop_2016" * 100, 1)</code></td></tr>
+<tr><td>Part des 65 ans ou plus (%)</td><td><code>round("pop_65plus" / "pop_totale" * 100, 1)</code></td></tr>
+<tr><td>Longueur d'un tronçon en kilomètres</td><td><code>$length / 1000</code></td></tr>
+<tr><td>Classement en trois catégories</td><td><code>CASE WHEN "densite" &lt; 50 THEN 'rural' WHEN "densite" &lt; 500 THEN 'périurbain' ELSE 'urbain' END</code></td></tr>
+</tbody></table></div>
+<div class="box"><p class="t">Champ réel ou champ virtuel ?</p><p>La calculatrice fait passer la couche en mode édition : enregistrez les modifications en quittant ce mode (icône du crayon). Si vous cochez <em>Créer un champ virtuel</em>, le champ est recalculé à chaque affichage et n'est stocké que dans le projet, ce qui convient à un indicateur provisoire. Les unités de <code>$area</code> et <code>$length</code> sont celles du SCR de la couche, d'où l'intérêt du Lambert-93, en mètres.</p></div>
+
+<div class="exo"><header><strong>Exercice 5 — Rattacher le recensement aux communes</strong><span>40 min</span></header><div>
+<ol class="pas" id="ex5">
+<li>Ouvrez dans Calc le fichier des populations communales de l'Insee. Supprimez les lignes d'en-tête superflues, vérifiez que la colonne du code commune est au format texte, enregistrez en CSV (séparateur point-virgule, UTF-8) dans <code>02_donnees_travail</code>.</li>
+<li>Importez ce CSV en texte délimité, sans géométrie, en contrôlant le type des champs.</li>
+<li>Dans les propriétés de <code>c2a_communes</code>, créez la jointure sur le code Insee, avec le préfixe <code>rp_</code>.</li>
+<li>Ouvrez la table : vérifiez qu'aucune commune ne présente de valeur NULL.</li>
+<li>Exportez la couche jointe sous <code>c2a_communes_rp.gpkg</code> et travaillez désormais sur cette couche.</li>
+<li>Avec la calculatrice, créez le champ décimal <code>densite</code> (habitants par km²).</li>
+<li>Créez le champ décimal <code>evol_pct</code>, taux d'évolution de la population entre les deux derniers recensements disponibles dans votre tableau.</li>
+<li>Quittez le mode édition en enregistrant. Triez la table par densité, puis par évolution.</li>
+</ol>
+<p class="resultat">Les communes les plus denses sont Albi et ses voisines immédiates ; les plus fortes croissances relatives se situent plutôt dans la couronne périurbaine. Ce contraste entre densité et dynamique est le point de départ de tout diagnostic d'étalement urbain.</p>
+</div></div>
+<details class="defi"><summary>Des arrêts de bus à l'offre par commune</summary><div>
+<p>Importez le fichier <code>stops.txt</code> du réseau de bus comme couche de points, reprojetez-le en Lambert-93, puis utilisez <span class="menu">Vecteur › Outils d'analyse › Compter les points dans les polygones</span> pour obtenir le nombre d'arrêts par commune. Calculez ensuite le nombre d'arrêts pour 1&nbsp;000 habitants. Que vaut cet indicateur pour comparer la desserte des communes ? Que néglige-t-il ?</p></div></details>
+<figure class="video"><figcaption>Vidéo 5 — Import d'un CSV de l'Insee, jointure et calcul d'une densité.</figcaption></figure>
+</section>
+
+
+<section class="module" id="m6" data-num="6" data-court="Symbologie et étiquettes">
+<div class="mod-tete"><div class="mod-num">6</div><div><h2>Représenter : symbologie et étiquettes</h2>
+<div class="mod-info"><span class="niv conso">Consolidation</span><span>1 h 30</span></div></div></div>
+<div class="objectifs"><strong>À la fin de ce module, vous saurez</strong><ul>
+<li>choisir le mode de représentation adapté à la nature d'une variable ;</li>
+<li>produire une carte en aplats de couleur et une carte en symboles proportionnels ;</li>
+<li>étiqueter une couche, y compris sous condition ;</li><li>enregistrer et réutiliser un style.</li></ul></div>
+<p class="conseil" data-debutant="Les règles de sémiologie vues avec Magrit s'appliquent ici sans changement. Seul l'outil diffère." data-initie="Passez rapidement sur les aplats et travaillez les symboles proportionnels par l'assistant de taille, puis les étiquettes par règles."></p>
+
+<p>QGIS n'est pas d'abord un logiciel de cartographie statistique, mais il en offre les fonctions. Elles sont utiles pour tout réaliser dans le même outil, ou pour traiter des couches trop volumineuses pour Magrit. Tout se règle dans l'onglet <em>Symbologie</em> des propriétés de la couche, ou dans le panneau <strong>Style de couche</strong> (<kbd>F7</kbd>), qui applique les changements en direct.</p>
+<div class="tab"><table><thead><tr><th>Nature de la variable</th><th>Exemple</th><th>Mode QGIS</th><th>Variable visuelle</th></tr></thead><tbody>
+<tr><td>Qualitative</td><td>EPCI d'appartenance, type de zone du PLU, nature d'un bâtiment</td><td>Catégorisé</td><td>Teinte</td></tr>
+<tr><td>Quantitative relative (taux, densité, part)</td><td>Densité, taux d'évolution, part de logements vacants</td><td>Gradué</td><td>Valeur (du clair au foncé)</td></tr>
+<tr><td>Quantitative absolue (effectif)</td><td>Population, nombre de logements, surface artificialisée</td><td>Symbole dont la taille varie</td><td>Taille</td></tr>
+<tr><td>Plusieurs effectifs composant un total</td><td>Logements par type, actifs par mode de transport</td><td>Diagramme</td><td>Taille et teinte</td></tr>
+</tbody></table></div>
+<div class="box attention"><p class="t">Rappel de sémiologie</p><p>Un effectif ne se représente jamais en aplat de couleur : la surface de la commune fausse la lecture. Albi, vaste et peuplée, écraserait visuellement une petite commune dense. Les effectifs appellent des symboles proportionnels, les taux des aplats.</p></div>
+
+<h3>Catégorisé : une teinte par modalité</h3>
+<p>Choisissez <em>Catégorisé</em>, désignez le champ dans <em>Valeur</em>, puis cliquez sur <em>Classer</em>. Un double-clic sur un symbole modifie sa couleur, un double-clic sur la légende modifie son libellé. Au-delà d'une dizaine de modalités, les teintes ne se distinguent plus : regroupez des modalités ou changez de représentation.</p>
+
+<h3>Gradué : des classes de valeurs</h3>
+<p>Choisissez <em>Gradué</em>, le champ numérique, une palette de couleurs ordonnée, un nombre de classes et un mode de discrétisation. L'onglet <em>Histogramme</em> affiche la distribution et les bornes des classes : consultez-le toujours avant de choisir.</p>
+<div class="tab"><table><thead><tr><th>Mode</th><th>Principe</th><th>À utiliser quand…</th></tr></thead><tbody>
+<tr><td>Compte égal (quantiles)</td><td>Même nombre d'entités dans chaque classe</td><td>la distribution est dissymétrique ; pour comparer plusieurs cartes</td></tr>
+<tr><td>Intervalles égaux</td><td>Classes de même amplitude</td><td>la distribution est uniforme ; les bornes sont faciles à lire</td></tr>
+<tr><td>Ruptures naturelles (Jenks)</td><td>Classes homogènes, bornes placées dans les creux de la distribution</td><td>la distribution présente des groupes ; carte unique</td></tr>
+<tr><td>Écart-type</td><td>Classes centrées sur la moyenne</td><td>la distribution est symétrique ; pour montrer des écarts à la moyenne</td></tr>
+<tr><td>Bornes manuelles</td><td>Double-clic sur une borne pour la modifier</td><td>il existe des seuils signifiants (0 pour une évolution, un seuil réglementaire)</td></tr>
+</tbody></table></div>
+<p>Pour une variable qui change de signe, comme un taux d'évolution, choisissez une palette divergente (deux teintes opposées de part et d'autre d'une couleur neutre) et fixez une borne à zéro. Arrondissez les bornes et réglez le format des libellés dans <em>Format de légende</em>.</p>
+<figure class="capture"><figcaption>Capture 6.1 — Symbologie graduée : choix du champ, du mode, des classes, et onglet Histogramme.</figcaption></figure>
+
+<h3>Symboles proportionnels</h3>
+<p>La méthode la plus rigoureuse associe une couche de points et l'<strong>assistant de taille</strong>.</p>
+<ol>
+<li>Créez les points : <span class="menu">Vecteur › Outils de géométrie › Centroïdes</span>, à partir de la couche des communes.</li>
+<li>Dans la symbologie de cette couche de points, gardez <em>Symbole unique</em> et sélectionnez le symbole <em>Marqueur simple</em>.</li>
+<li>À droite du champ <em>Taille</em>, cliquez sur le bouton de valeur définie par les données, puis <em>Assistant…</em></li>
+<li>Désignez le champ (la population), cliquez sur le bouton de récupération des valeurs minimale et maximale, choisissez la méthode d'échelle <em>Surface</em> (ou <em>Flannery</em>, qui compense la sous-estimation perceptive des grands cercles) et réglez la taille maximale.</li>
+<li>Dans <em>Avancé › Légende des tailles définies par les données</em>, activez une légende repliée pour que les cercles de référence figurent dans la légende.</li>
+</ol>
+<p>Placez la couche de cercles au-dessus d'un fond gradué pour combiner un effectif et un taux sur la même carte, par exemple la population et son évolution.</p>
+
+<h3>Diagrammes</h3>
+<p>L'onglet <em>Diagrammes</em> des propriétés dessine, sur chaque entité, un diagramme en secteurs ou en barres. Dans <em>Attributs</em>, ajoutez les champs à représenter et fixez leurs couleurs et leurs libellés. Dans <em>Taille</em>, choisissez une taille fixe pour montrer seulement une répartition, ou une taille variable, proportionnelle à un total, pour montrer à la fois le volume et sa composition. Réservez les barres aux comparaisons de quelques valeurs ou aux évolutions dans le temps, et limitez-vous à trois ou quatre modalités : au-delà, la carte devient illisible.</p>
+
+<h3>Étiquettes</h3>
+<p>Onglet <em>Étiquettes</em> : choisissez <em>Étiquettes simples</em> et le champ à afficher. Les rubriques à connaître sont les suivantes.</p>
+<div class="tab"><table><thead><tr><th>Rubrique</th><th>Réglage utile</th></tr></thead><tbody>
+<tr><td>Texte</td><td>Police, taille, couleur. Une police sans empattement de 7 à 9 points convient à la plupart des cartes.</td></tr>
+<tr><td>Formatage</td><td>Casse, retour à la ligne sur un caractère, nombre de décimales pour les valeurs numériques.</td></tr>
+<tr><td>Tampon</td><td>Halo de la couleur du fond autour des lettres : le réglage qui améliore le plus la lisibilité.</td></tr>
+<tr><td>Arrière-plan, ombre</td><td>Cartouche ou ombre portée, à employer avec retenue.</td></tr>
+<tr><td>Position</td><td>Placement par rapport à l'entité : autour du point, le long de la ligne, au centre du polygone.</td></tr>
+<tr><td>Rendu</td><td>Visibilité selon l'échelle, gestion des chevauchements, affichage de toutes les étiquettes.</td></tr>
+</tbody></table></div>
+<p>L'étiquette peut être une expression. Pour afficher le nom et la population sur deux lignes : <code>"NOM" || '\n' || format_number("POPULATION", 0) || ' hab.'</code></p>
+<p><strong>Étiquettes basées sur des règles</strong> : ce mode applique un style différent, ou aucune étiquette, selon une condition. Créez une règle par cas, avec un filtre tel que <code>"POPULATION" &gt;= 5000</code> pour les communes principales en caractères gras, et une seconde règle <em>Sinon</em> en caractères plus petits. La symbologie propose le même principe avec le mode <em>Ensemble de règles</em>.</p>
+<div class="box astuce"><p class="t">Réutiliser un style</p><p>Clic droit sur la couche › <span class="menu">Styles › Copier le style</span>, puis <span class="menu">Coller le style</span> sur une autre couche. Pour le conserver dans un fichier, propriétés › bouton <em>Style</em> en bas de la fenêtre › <span class="menu">Enregistrer le style…</span> au format QML. Dans un GeoPackage, le style peut aussi être enregistré avec la couche, et s'appliquera à chaque chargement.</p></div>
+
+<div class="exo"><header><strong>Exercice 6 — Population et dynamique démographique de l'agglomération</strong><span>45 min</span></header><div>
+<ol class="pas" id="ex6">
+<li>Sur <code>c2a_communes_rp</code>, appliquez un style gradué sur <code>evol_pct</code>, cinq classes, palette divergente. Fixez manuellement une borne à 0.</li>
+<li>Consultez l'histogramme et ajustez les autres bornes à des valeurs rondes. Mettez en forme les libellés de légende (une décimale, signe %).</li>
+<li>Créez la couche de centroïdes des communes et enregistrez-la en GeoPackage.</li>
+<li>Avec l'assistant de taille, rendez les cercles proportionnels à la population (méthode Surface, taille maximale d'environ 18&nbsp;mm). Donnez-leur un contour sombre et un remplissage blanc à 60&nbsp;% d'opacité.</li>
+<li>Activez la légende des tailles (légende repliée, trois valeurs de référence).</li>
+<li>Étiquetez les communes par leur nom, avec un tampon blanc de 1&nbsp;mm. Utilisez des règles pour écrire en gras les communes de 5&nbsp;000 habitants ou plus.</li>
+<li>Enregistrez les deux styles au format QML dans <code>02_donnees_travail</code>, puis le projet.</li>
+</ol>
+<p class="resultat">La carte superpose l'effectif (cercles) et la dynamique (aplats). Elle doit faire apparaître d'un seul regard le poids de la ville-centre et la croissance de sa couronne.</p>
+</div></div>
+<details class="defi"><summary>Typologie du bâti</summary><div><p>Représentez les bâtiments de la BD TOPO selon leur usage principal (mode catégorisé), en regroupant les modalités en quatre familles à l'aide d'une expression <code>CASE WHEN</code> saisie directement dans le champ <em>Valeur</em>. Faites ensuite dépendre l'affichage de l'échelle : couche invisible au-delà du 1/50&nbsp;000 (propriétés › Rendu).</p></div></details>
+<figure class="video"><figcaption>Vidéo 6 — Carte graduée, symboles proportionnels et étiquettes.</figcaption></figure>
+</section>
+
+
+<section class="module" id="m7" data-num="7" data-court="La mise en page">
+<div class="mod-tete"><div class="mod-num">7</div><div><h2>Mettre en page et exporter une carte</h2>
+<div class="mod-info"><span class="niv conso">Consolidation</span><span>1 h 15</span></div></div></div>
+<div class="objectifs"><strong>À la fin de ce module, vous saurez</strong><ul>
+<li>composer une carte complète : titre, légende, échelle, orientation, sources, auteur et date ;</li>
+<li>régler précisément l'emprise et l'échelle ;</li><li>exporter en PDF et en image.</li></ul></div>
+<p class="conseil" data-debutant="Une carte sans légende, sans échelle ou sans source n'est pas recevable dans un rapport : ce module y remédie." data-initie="Faites l'exercice 7, puis le défi sur l'atlas, très utile pour produire une fiche par commune."></p>
+
+<h3>Ouvrir une mise en page</h3>
+<p><span class="menu">Projet › Nouvelle mise en page…</span> (<kbd>Ctrl</kbd>+<kbd>P</kbd>), puis donnez-lui un nom. Le <span class="menu">Gestionnaire de mises en page</span> liste, duplique et supprime celles du projet. La fenêtre qui s'ouvre comporte la page au centre, la barre d'outils d'ajout d'éléments à gauche, et à droite les panneaux <em>Éléments</em> (liste et ordre d'empilement), <em>Mise en page</em> (réglages généraux, résolution d'export) et <em>Propriétés de l'élément</em> (réglages de l'élément sélectionné). Clic droit sur la page › <em>Propriétés de la page</em> pour choisir le format et l'orientation.</p>
+
+<h3>Ajouter et régler les éléments</h3>
+<p>Choisissez un outil dans <span class="menu">Ajouter un élément</span>, puis tracez un rectangle sur la page.</p>
+<div class="tab"><table><thead><tr><th>Élément</th><th>Réglages essentiels</th></tr></thead><tbody>
+<tr><td><strong>Carte</strong></td><td>Saisissez l'échelle (une valeur ronde : 50&nbsp;000, 100&nbsp;000). L'outil <em>Déplacer le contenu de l'élément</em> recadre la carte dans son cadre. Cochez <em>Verrouiller les couches</em> pour figer le contenu, ce qui permet plusieurs cartes différentes dans le même projet. La rubrique <em>Grilles</em> ajoute un carroyage de coordonnées.</td></tr>
+<tr><td><strong>Légende</strong></td><td>Par défaut, elle reprend toutes les couches du projet. Désactivez la synchronisation automatique pour retirer les couches d'habillage, réordonner et renommer les entrées. Cochez <em>N'afficher que les éléments à l'intérieur de la carte liée</em> pour alléger.</td></tr>
+<tr><td><strong>Barre d'échelle</strong></td><td>Unité (mètres ou kilomètres), nombre et taille des segments, en valeurs rondes. Elle reste juste si la carte est agrandie ou réduite à l'impression, contrairement à une échelle numérique.</td></tr>
+<tr><td><strong>Flèche du nord</strong></td><td>Indispensable seulement si le nord n'est pas en haut de la page.</td></tr>
+<tr><td><strong>Étiquette</strong></td><td>Titre, sous-titre, sources, auteur, date. Le texte peut contenir une expression, par exemple la date du jour : <code>[% format_date(now(), 'dd/MM/yyyy') %]</code></td></tr>
+<tr><td><strong>Image</strong></td><td>Logo de l'université ou du commanditaire.</td></tr>
+<tr><td><strong>Table d'attributs</strong></td><td>Extrait de la table d'une couche ; le bouton <em>Attributs…</em> choisit et renomme les colonnes.</td></tr>
+</tbody></table></div>
+<div class="box v4"><p class="t">Selon votre version</p><p>En 4.x, la légende propose trois modes : synchronisation sur toutes les couches du projet, sur les couches visibles, ou sélection manuelle. En 3.44, la même fonction passe par la case <em>Mise à jour auto</em>, à décocher pour modifier la légende à la main. La série 4 ajoute aussi un élément graphique (diagramme) à la mise en page.</p></div>
+<figure class="capture"><figcaption>Capture 7.1 — Fenêtre de mise en page avec ses panneaux Éléments et Propriétés de l'élément.</figcaption></figure>
+<div class="box astuce"><p class="t">Gestes utiles</p><ul>
+<li><kbd>Maj</kbd> pendant le redimensionnement conserve les proportions ; <kbd>Ctrl</kbd> pendant un déplacement désactive l'accrochage à la grille.</li>
+<li><kbd>Ctrl</kbd>+clic sélectionne un élément placé sous un autre.</li>
+<li>Cliquez dans les règles pour créer des guides d'alignement.</li>
+<li>Le cadenas du panneau Éléments verrouille la position d'un élément.</li>
+<li>Renommez les couches dans le projet plutôt que dans la légende : le nom sera correct dans toutes vos mises en page.</li></ul></div>
+
+<h3>La liste de contrôle d'une carte recevable</h3>
+<ul>
+<li>Un <strong>titre</strong> qui énonce le sujet, le lieu et la date des données.</li>
+<li>Une <strong>légende</strong> complète, aux libellés compréhensibles sans connaître la table d'attributs.</li>
+<li>Une <strong>échelle</strong> graphique.</li>
+<li>Les <strong>sources</strong> et leur millésime (par exemple : IGN, ADMIN EXPRESS 2026 ; Insee, recensement de la population 2022).</li>
+<li>L'<strong>auteur</strong>, la <strong>date</strong> de réalisation et, pour un document technique, le système de coordonnées.</li>
+</ul>
+
+<h3>Exporter</h3>
+<p>Menu <span class="menu">Mise en page</span> : <em>Exporter au format PDF</em> pour un rapport ou une impression (texte et vecteurs restent nets), <em>Exporter au format image</em> en PNG à 300&nbsp;dpi pour un diaporama ou un traitement de texte, <em>Exporter au format SVG</em> pour retoucher la carte dans un logiciel de dessin. Enregistrez vos exports dans <code>04_cartes</code>.</p>
+
+<div class="exo"><header><strong>Exercice 7 — Produire la carte démographique de l'agglomération</strong><span>40 min</span></header><div>
+<ol class="pas" id="ex7">
+<li>Dans le projet, ne laissez visibles que les couches utiles : fond gradué, cercles, limites, cours d'eau principal. Renommez-les lisiblement.</li>
+<li>Créez une mise en page «&nbsp;Démographie C2A&nbsp;» au format A4 paysage.</li>
+<li>Ajoutez la carte, fixez une échelle ronde qui contient toute l'agglomération, et recadrez.</li>
+<li>Ajoutez la légende, retirez les entrées inutiles, vérifiez les libellés des classes et des cercles.</li>
+<li>Ajoutez une barre d'échelle en kilomètres, à deux ou trois segments.</li>
+<li>Ajoutez le titre, puis une étiquette de sources, d'auteur et de date en petits caractères.</li>
+<li>Alignez les éléments à l'aide des guides et des outils d'alignement.</li>
+<li>Exportez en PDF dans <code>04_cartes</code> et contrôlez le résultat à 100&nbsp;%.</li>
+</ol>
+<p class="resultat">Un PDF d'une page, lisible sans explication orale. Faites-le relire par votre voisin : s'il pose une question sur ce que montre la carte, la légende ou le titre sont à reprendre.</p>
+</div></div>
+<details class="defi"><summary>Un atlas : une page par commune</summary><div><p>Dans le panneau <em>Atlas</em> de la mise en page, cochez <em>Générer un atlas</em>, choisissez la couche des communes comme couche de couverture et le nom de la commune comme nom de page. Dans les propriétés de la carte, cochez <em>Contrôlé par l'atlas</em>. Insérez dans le titre l'expression <code>[% "NOM" %]</code>. Parcourez l'aperçu, puis exportez les 16 pages en un seul PDF. À quoi servirait cette fonction pour un porter à connaissance ou un diagnostic communal ?</p></div></details>
+<figure class="video"><figcaption>Vidéo 7 — De la carte à l'écran au PDF mis en page.</figcaption></figure>
+</section>
+
+
+<section class="module" id="m8" data-num="8" data-court="Les flux">
+<div class="mod-tete"><div class="mod-num">8</div><div><h2>Utiliser des données en flux</h2>
+<div class="mod-info"><span class="niv conso">Consolidation</span><span>45 min</span></div></div></div>
+<div class="objectifs"><strong>À la fin de ce module, vous saurez</strong><ul>
+<li>distinguer les services WMS, WMTS, WFS et les tuiles XYZ ;</li>
+<li>connecter QGIS à la Géoplateforme de l'IGN ;</li><li>choisir entre un flux et un téléchargement.</li></ul></div>
+<p class="conseil" data-debutant="Les flux évitent de télécharger des fichiers très lourds : ils vous serviront dans tous vos projets." data-initie="Vérifiez que vous savez enregistrer une couche WFS en local, puis passez à l'exercice."></p>
+
+<p>Plutôt que de télécharger les données, on peut les lire à distance sur le serveur du producteur, grâce à des protocoles normalisés, indépendants du logiciel utilisé. La connexion est enregistrée dans le projet ; les données, elles, restent sur le serveur et sont toujours à jour.</p>
+<div class="tab"><table><thead><tr><th>Service</th><th>Ce que l'on reçoit</th><th>Usage</th><th>Limite</th></tr></thead><tbody>
+<tr><td><strong>WMS</strong> <em>Web Map Service</em></td><td>Une image calculée à la demande</td><td>Fond de carte, zonage à consulter</td><td>Pas d'accès aux géométries ; style imposé</td></tr>
+<tr><td><strong>WMTS</strong> <em>Web Map Tile Service</em></td><td>Des images prédécoupées en tuiles</td><td>Fond de carte rapide : orthophotographie, plan IGN</td><td>Échelles prédéfinies</td></tr>
+<tr><td><strong>XYZ</strong></td><td>Des tuiles, sans catalogue</td><td>Fond OpenStreetMap</td><td>En Pseudo-Mercator ; reprojeté à la volée</td></tr>
+<tr><td><strong>WFS</strong> <em>Web Feature Service</em></td><td>Les objets vectoriels et leurs attributs</td><td>Sélections, traitements, style libre</td><td>Lent sur de grandes emprises ; nombre d'objets plafonné par requête</td></tr>
+</tbody></table></div>
+
+<h3>Se connecter à la Géoplateforme</h3>
+<p>La Géoplateforme (<a href="https://cartes.gouv.fr/">cartes.gouv.fr</a>) diffuse les données de l'IGN et de nombreux partenaires. Les adresses à déclarer sont les suivantes.</p>
+<div class="tab"><table><thead><tr><th>Service</th><th>Adresse</th></tr></thead><tbody>
+<tr><td>WMTS</td><td><code>https://data.geopf.fr/wmts?SERVICE=WMTS&amp;VERSION=1.0.0&amp;REQUEST=GetCapabilities</code></td></tr>
+<tr><td>WMS raster</td><td><code>https://data.geopf.fr/wms-r/wms?</code></td></tr>
+<tr><td>WMS vecteur</td><td><code>https://data.geopf.fr/wms-v/wms?</code></td></tr>
+<tr><td>WFS</td><td><code>https://data.geopf.fr/wfs?</code></td></tr>
+</tbody></table></div>
+<ol>
+<li>Dans l'Explorateur, clic droit sur <strong>WMS/WMTS</strong> (ou <strong>WFS / OGC API - Features</strong>) › <span class="menu">Nouvelle connexion…</span></li>
+<li>Donnez un nom à la connexion, par exemple «&nbsp;Géoplateforme WMTS&nbsp;», collez l'adresse, validez.</li>
+<li>Dépliez la connexion : la liste des couches disponibles s'affiche. Un double-clic charge la couche dans la carte.</li>
+</ol>
+<p>Le <a href="https://cartes.gouv.fr/aide/fr/guides-utilisateur/utiliser-les-services-de-la-geoplateforme/tutoriels-api/qgis/">guide de la Géoplateforme pour QGIS</a> détaille la procédure et ses variantes.</p>
+<div class="box attention"><p class="t">Flux ou téléchargement ?</p><ul>
+<li>Un flux suppose une connexion permanente ; l'affichage dépend du réseau et du serveur.</li>
+<li>Une couche WFS à l'échelle d'un département peut être très lente : zoomez d'abord sur votre zone et cochez l'option qui limite le chargement à l'emprise de la vue.</li>
+<li>Pour un traitement, enregistrez la couche WFS en local (<span class="menu">Exporter › Sauvegarder les entités sous…</span>) : vous figez ainsi le millésime utilisé, ce qui rend l'analyse reproductible.</li></ul></div>
+<div class="metiers">
+<div class="urb"><p class="t">Aménagement urbain</p><p>Le <a href="https://www.geoportail-urbanisme.gouv.fr/">Géoportail de l'urbanisme</a> diffuse en flux les zonages des PLU et les servitudes d'utilité publique : vous consultez toujours le document opposable en vigueur.</p></div>
+<div class="env"><p class="t">Environnement</p><p>Les espaces protégés, les zonages de risque de <a href="https://www.georisques.gouv.fr/">Géorisques</a> et le registre parcellaire graphique sont disponibles en flux, sans téléchargement préalable.</p></div>
+</div>
+<div class="exo"><header><strong>Exercice 8 — Habiller le projet avec des fonds en flux</strong><span>20 min</span></header><div>
+<ol class="pas" id="ex8">
+<li>Créez les connexions WMTS et WFS à la Géoplateforme.</li>
+<li>Chargez en WMTS l'orthophotographie et le plan IGN. Placez-les dans un groupe «&nbsp;Fonds&nbsp;», tout en bas du panneau Couches.</li>
+<li>Donnez 50&nbsp;% d'opacité au plan IGN et observez la superposition avec l'orthophotographie.</li>
+<li>Zoomez sur le centre d'Albi. Dans la connexion WFS, recherchez la couche des parcelles cadastrales et chargez-la, limitée à l'emprise de la vue.</li>
+<li>Exportez ces parcelles en GeoPackage dans <code>02_donnees_travail</code>.</li>
+</ol>
+<p class="resultat">Vous disposez de deux fonds de référence utilisables dans tous les modules suivants, et d'un extrait cadastral enregistré localement.</p>
+</div></div>
+<figure class="video"><figcaption>Vidéo 8 — Connexion aux flux de la Géoplateforme.</figcaption></figure>
+</section>
+<!-- ============================ PARTIE C ============================ -->
+<section class="module" id="m9" data-num="9" data-court="Géoréférencer" data-partie="C · Approfondissement">
+<div class="mod-tete"><div class="mod-num">9</div><div><h2>Géoréférencer un document ancien</h2>
+<div class="mod-info"><span class="niv appro">Approfondissement</span><span>1 h 15</span></div></div></div>
+<div class="objectifs"><strong>À la fin de ce module, vous saurez</strong><ul>
+<li>caler une photographie aérienne ou une carte scannée sur un référentiel actuel ;</li>
+<li>choisir un type de transformation et juger la qualité d'un calage.</li></ul></div>
+<p class="conseil" data-debutant="Ce module demande de la patience et une souris. Deux ou trois essais sont normaux." data-initie="Comparez deux transformations sur la même image, comme le propose le défi."></p>
+<div class="metiers">
+<div class="urb"><p class="t">Aménagement urbain</p><p>Comparer une photographie aérienne des années 1950 à l'orthophotographie actuelle permet de reconstituer les étapes de l'urbanisation et de dater l'apparition d'un quartier ou d'une zone d'activité.</p></div>
+<div class="env"><p class="t">Environnement</p><p>Les clichés anciens documentent le recul des haies, le déplacement du lit d'une rivière, la fermeture d'un paysage par la forêt : autant d'états de référence pour un projet de restauration.</p></div>
+</div>
+<p>Un document scanné n'a pas de coordonnées. Le géoréférencement consiste à lui en donner, en désignant des <strong>points de contrôle</strong> dont on connaît la position réelle. Il vous faut l'image à caler, par exemple une photographie téléchargée sur <a href="https://remonterletemps.ign.fr/">Remonter le temps</a>, et une référence déjà calée : l'orthophotographie en flux, le plan IGN ou la BD TOPO.</p>
+
+<h3>La procédure</h3>
+<ol>
+<li>Affichez la référence dans la carte, zoomée sur le secteur concerné.</li>
+<li>Ouvrez <span class="menu">Couche › Géoréférencer…</span> Une fenêtre indépendante s'ouvre.</li>
+<li>Chargez l'image : <span class="menu">Fichier › Ouvrir un raster…</span></li>
+<li>Avec l'outil <em>Ajouter un point</em>, cliquez sur un repère de l'image, puis sur <em>Depuis le canevas de la carte</em> : QGIS bascule sur la carte, où vous cliquez sur le même repère. Les coordonnées sont récupérées automatiquement. Si vous les connaissez, vous pouvez aussi les saisir.</li>
+<li>Répétez l'opération. Chaque point s'ajoute à la table des points de contrôle, en bas de la fenêtre.</li>
+<li>Ouvrez les <em>Paramètres de transformation</em> : type de transformation, SCR cible (EPSG:2154), fichier de sortie, et case <em>Charger dans le projet</em>.</li>
+<li>Lancez le géoréférencement, puis contrôlez la superposition dans la carte en réglant l'opacité de l'image calée.</li>
+</ol>
+<figure class="capture"><figcaption>Capture 9.1 — Fenêtre du géoréférenceur : image, points de contrôle numérotés, table des résidus.</figcaption></figure>
+<p>Enregistrez vos points (<span class="menu">Fichier › Enregistrer les points de contrôle</span>) : vous pourrez les recharger pour corriger un calage ou caler un cliché voisin.</p>
+
+<h3>Choisir la transformation</h3>
+<div class="tab"><table><thead><tr><th>Transformation</th><th>Points minimum</th><th>Effet</th><th>Situation type</th></tr></thead><tbody>
+<tr><td>Helmert</td><td class="num">2</td><td>Translation, rotation, changement d'échelle</td><td>Plan récent, export numérique sans déformation</td></tr>
+<tr><td>Polynomiale 1</td><td class="num">3</td><td>Ajoute un étirement et un cisaillement</td><td>Carte ou plan scanné : <strong>le choix par défaut</strong></td></tr>
+<tr><td>Projective</td><td class="num">4</td><td>Corrige un effet de perspective</td><td>Vue aérienne oblique sur terrain plat</td></tr>
+<tr><td>Polynomiale 2 et 3</td><td class="num">6 et 10</td><td>Déformations courbes</td><td>Distorsion optique modérée ; à manier avec prudence</td></tr>
+<tr><td>Thin Plate Spline</td><td class="num">10 et plus</td><td>Déformation locale, l'image passe par chaque point</td><td>Photographie en relief marqué, avec de nombreux points bien répartis</td></tr>
+</tbody></table></div>
+<p>Essayez d'abord Helmert ou Polynomiale&nbsp;1. Ne passez aux autres que si le résultat est médiocre. Les polynomiales d'ordre 2 et 3 réduisent l'erreur moyenne affichée, mais déforment l'image de façon imprévisible loin des points de contrôle.</p>
+<div class="box astuce"><p class="t">Pour un bon calage</p><ul>
+<li>Préférez six à dix points sûrs, bien répartis jusque dans les angles, à trente points approximatifs.</li>
+<li>Choisissez des repères stables dans le temps : clocher, entrée ou milieu d'un pont, carrefour ancien, corps de ferme, monument, voie ferrée, gare, passage à niveau.</li>
+<li>En zone rurale, les angles de parcelles sont utiles, sauf là où un remembrement a eu lieu.</li>
+<li>Surveillez la colonne des <strong>résidus</strong> : un point dont le résidu est très supérieur aux autres est mal placé. Supprimez-le ou déplacez-le.</li>
+<li>Travaillez à la souris, non au pavé tactile.</li></ul></div>
+
+<div class="exo"><header><strong>Exercice 9 — Albi vers 1950</strong><span>45 min</span></header><div>
+<ol class="pas" id="ex9">
+<li>Chargez la photographie aérienne ancienne du kit dans le géoréférenceur. Affichez dans la carte l'orthophotographie actuelle.</li>
+<li>Placez un premier point sur un repère indiscutable, par exemple une extrémité du Pont-Vieux.</li>
+<li>Placez au moins cinq autres points, répartis sur toute l'image.</li>
+<li>Paramétrez la transformation Polynomiale&nbsp;1, le SCR 2154 et une sortie dans <code>02_donnees_travail</code>.</li>
+<li>Lancez le calage. Relevez l'erreur moyenne et repérez le point au résidu le plus fort.</li>
+<li>Dans la carte, réglez l'opacité de l'image calée à 50&nbsp;% et contrôlez la superposition des rues et des berges.</li>
+<li>Enregistrez les points de contrôle.</li>
+</ol>
+<p class="resultat">Les rues du centre ancien se superposent à quelques mètres près. Les écarts sont plus forts sur les bords de l'image : c'est la conséquence de la déformation optique du cliché, qu'une transformation simple ne corrige pas.</p>
+</div></div>
+<details class="defi"><summary>Comparer deux transformations</summary><div><p>Refaites le calage avec la transformation Thin Plate Spline après avoir porté le nombre de points à douze. Comparez les deux images calées par transparence. Laquelle retiendriez-vous pour mesurer l'extension du bâti, et pourquoi une erreur moyenne nulle n'est-elle pas une garantie de qualité ?</p></div></details>
+<figure class="video"><figcaption>Vidéo 9 — Calage d'une photographie aérienne ancienne.</figcaption></figure>
+</section>
+
+
+<section class="module" id="m10" data-num="10" data-court="Numériser">
+<div class="mod-tete"><div class="mod-num">10</div><div><h2>Numériser : créer et corriger des données</h2>
+<div class="mod-info"><span class="niv appro">Approfondissement</span><span>1 h 15</span></div></div></div>
+<div class="objectifs"><strong>À la fin de ce module, vous saurez</strong><ul>
+<li>créer une couche et définir sa table d'attributs ;</li>
+<li>dessiner des points, des lignes et des polygones jointifs grâce à l'accrochage ;</li>
+<li>modifier des géométries et des attributs sans abîmer la donnée d'origine.</li></ul></div>
+<p class="conseil" data-debutant="Travaillez toujours sur une couche que vous avez créée ou copiée, jamais sur les données brutes." data-initie="Portez votre attention sur l'accrochage, le tracé automatique et l'édition topologique."></p>
+<p>Toute couche vectorielle est issue d'une numérisation, automatique ou manuelle. Vous aurez à numériser pour relever une information de terrain, délimiter un périmètre de projet, ou interpréter une photographie : c'est ainsi que l'on produit une donnée qui n'existe nulle part ailleurs.</p>
+
+<h3>Créer une couche</h3>
+<p><span class="menu">Couche › Créer une couche › Nouvelle couche GeoPackage…</span> Indiquez le fichier, le nom de la table, le type de géométrie (point, ligne, polygone), le SCR EPSG:2154, puis ajoutez les champs un à un avec leur type : texte, nombre entier, nombre décimal, date. Réfléchissez aux champs avant de dessiner : ils déterminent ce que vous pourrez analyser ensuite.</p>
+
+<h3>Dessiner</h3>
+<ol>
+<li>Sélectionnez la couche et basculez en <strong>mode édition</strong> (icône du crayon).</li>
+<li>Activez l'outil d'ajout d'entité, dont l'icône dépend du type de géométrie.</li>
+<li>Clic gauche pour poser chaque sommet, <strong>clic droit pour terminer</strong>. Un point se pose d'un seul clic.</li>
+<li>Renseignez les attributs dans le formulaire qui s'ouvre.</li>
+<li>Enregistrez les modifications de la couche régulièrement, puis quittez le mode édition.</li>
+</ol>
+<p>La barre <em>Numérisation de formes</em> trace des cercles, rectangles et polygones réguliers. La barre <em>Numérisation avancée</em> offre notamment le déplacement, la rotation, la découpe et la fusion d'entités, ainsi que le remodelage d'un contour.</p>
+
+<h3>L'accrochage</h3>
+<p>Sans accrochage, deux polygones voisins dessinés à la main se chevauchent ou laissent des interstices, ce qui fausse les surfaces et les traitements. Ouvrez <span class="menu">Projet › Options d'accrochage…</span> ou affichez la barre d'outils <em>Accrochage</em>.</p>
+<ul>
+<li>Activez l'accrochage (icône de l'aimant), sur toutes les couches ou en configuration avancée, couche par couche.</li>
+<li>Choisissez le type (sommet, segment) et une tolérance d'une dizaine de pixels.</li>
+<li>Activez l'<strong>édition topologique</strong> : déplacer un sommet commun à deux polygones modifie les deux.</li>
+<li>Activez le <strong>tracé automatique</strong> (touche <kbd>T</kbd>) : en cliquant deux points d'un contour existant, QGIS suit ce contour entre les deux.</li>
+<li>Activez l'option qui évite les chevauchements : la partie d'un nouveau polygone qui recouvre un voisin est retranchée automatiquement.</li>
+</ul>
+
+<h3>Modifier</h3>
+<ul>
+<li><strong>Sommets</strong> : l'outil de sommets déplace un sommet (un clic pour le saisir, un clic pour le déposer), en ajoute un par double-clic sur un segment, en supprime un avec la touche <kbd>Suppr</kbd>.</li>
+<li><strong>Attributs</strong> : en mode édition, double-cliquez dans une cellule de la table, ou identifiez l'entité pour ouvrir son formulaire.</li>
+<li><strong>Suppression</strong> : sélectionnez l'entité puis utilisez <em>Supprimer les entités sélectionnées</em>.</li>
+</ul>
+<div class="box attention"><p class="t">Précautions</p><ul>
+<li>Avant de modifier une couche existante, faites-en une copie.</li>
+<li>Supprimer une ligne de la table d'attributs supprime aussi la géométrie correspondante.</li>
+<li>Tant que vous n'avez pas enregistré les modifications de la couche, <kbd>Ctrl</kbd>+<kbd>Z</kbd> annule vos dernières actions.</li></ul></div>
+
+<div class="exo"><header><strong>Exercice 10 — Relever les espaces verts publics d'un quartier</strong><span>40 min</span></header><div>
+<ol class="pas" id="ex10">
+<li>Créez la couche GeoPackage <code>espaces_verts</code>, polygones, EPSG:2154, avec les champs <code>nom</code> (texte), <code>type</code> (texte : parc, square, berge, jardin partagé) et <code>source</code> (texte).</li>
+<li>Affichez l'orthophotographie en fond et zoomez sur un quartier d'Albi vers le 1/2&nbsp;000.</li>
+<li>Activez l'accrochage sur toutes les couches, sommets et segments, ainsi que l'édition topologique.</li>
+<li>Numérisez cinq espaces verts. Pour deux espaces contigus, utilisez le tracé automatique sur leur limite commune.</li>
+<li>Renseignez les attributs de chaque polygone.</li>
+<li>Corrigez un contour avec l'outil de sommets, puis enregistrez et quittez le mode édition.</li>
+<li>Avec la calculatrice de champ, ajoutez la surface en mètres carrés (<code>round($area)</code>).</li>
+<li>Créez de la même façon une couche de points <code>bancs</code> et placez-en quelques-uns.</li>
+</ol>
+<p class="resultat">Une couche de cinq polygones jointifs, sans chevauchement, dont la table porte un nom, un type et une surface. Vérifiez la validité des géométries avec l'outil <em>Vérifier la validité</em> de la boîte à outils.</p>
+</div></div>
+<details class="defi"><summary>Mesurer l'extension urbaine entre deux dates</summary><div><p>Sur la photographie aérienne calée au module&nbsp;9, numérisez l'enveloppe bâtie d'un quartier vers 1950, puis numérisez l'enveloppe actuelle sur l'orthophotographie. Calculez les deux surfaces et le taux de croissance. Quelles conventions avez-vous dû adopter pour décider de ce qui appartient à «&nbsp;l'enveloppe bâtie&nbsp;» ? Rédigez-les en trois lignes : c'est la métadonnée de votre couche.</p></div></details>
+<figure class="video"><figcaption>Vidéo 10 — Création d'une couche, accrochage et tracé automatique.</figcaption></figure>
+</section>
+
+
+<section class="module" id="m11" data-num="11" data-court="Géotraitements vectoriels">
+<div class="mod-tete"><div class="mod-num">11</div><div><h2>Croiser les couches : les géotraitements vectoriels</h2>
+<div class="mod-info"><span class="niv appro">Approfondissement</span><span>2 h</span></div></div></div>
+<div class="objectifs"><strong>À la fin de ce module, vous saurez</strong><ul>
+<li>choisir le traitement qui répond à une question spatiale ;</li>
+<li>enchaîner tampon, découpage, intersection, différence et regroupement ;</li>
+<li>transférer des attributs d'une couche à une autre selon leur position ;</li>
+<li>produire un tableau de résultats chiffrés.</li></ul></div>
+<p class="conseil" data-debutant="C'est ici que le SIG devient un outil d'analyse. Suivez d'abord l'exercice guidé, puis refaites-le sans regarder les étapes." data-initie="Lisez le tableau de choix des traitements, puis traitez directement l'exercice 11 et le défi sur la population exposée."></p>
+<p>Un géotraitement prend une ou plusieurs couches en entrée et produit une <strong>nouvelle couche</strong>, sans modifier les couches d'origine. Tous les outils se trouvent dans la <strong>boîte à outils de traitements</strong> (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>T</kbd>, ou <span class="menu">Traitement › Boîte à outils</span>) ; les plus courants figurent aussi dans le menu <span class="menu">Vecteur</span>.</p>
+
+<figure class="schema"><svg viewBox="0 0 640 330" role="img" aria-label="Les cinq géotraitements de base">
+<g font-size="12.5" font-weight="600"><text x="14" y="20">Tampon</text><text x="228" y="20">Couper (découpage)</text><text x="442" y="20">Intersection</text><text x="14" y="190">Différence</text><text x="228" y="190">Regrouper</text><text x="442" y="190">Union</text></g>
+<g stroke-width="1.5">
+<path d="M30,95 C70,60 110,110 170,70" stroke="var(--teal)" stroke-width="34" stroke-linecap="round" fill="none" opacity=".25"/>
+<path class="s-teal" stroke-width="2.5" d="M30,95 C70,60 110,110 170,70"/>
+<rect class="s-ink" stroke-dasharray="4 3" x="268" y="50" width="100" height="70"/>
+<circle class="f-paper" cx="250" cy="60" r="4"/><circle class="f-paper" cx="390" cy="110" r="4"/><circle class="f-paper" cx="380" cy="50" r="4"/>
+<circle class="d-terra" cx="290" cy="70" r="4"/><circle class="d-terra" cx="330" cy="100" r="4"/><circle class="d-terra" cx="350" cy="65" r="4"/>
+<rect class="f-paper" x="452" y="42" width="90" height="65"/><rect class="f-paper" x="502" y="72" width="90" height="65"/><rect class="f-terra" x="502" y="72" width="40" height="35"/>
+<rect class="f-terra" x="24" y="212" width="110" height="80"/><rect class="f-surf" stroke-dasharray="4 3" x="84" y="252" width="90" height="60"/>
+<polygon class="f-teal" points="238,215 300,215 300,250 340,250 340,215 400,215 400,300 238,300"/>
+<line class="s-ink" stroke-dasharray="3 3" stroke-width="1" x1="300" y1="250" x2="300" y2="300"/><line class="s-ink" stroke-dasharray="3 3" stroke-width="1" x1="340" y1="250" x2="340" y2="300"/>
+<rect class="f-ochre" x="452" y="212" width="90" height="65"/><rect class="f-ochre" x="502" y="242" width="90" height="65"/><rect class="f-terra" x="502" y="242" width="40" height="35"/>
+</g>
+<g font-size="11" class="t-muted">
+<text x="14" y="140">zone à distance donnée d'un objet</text><text x="228" y="140">ne garde que ce qui est dans le masque</text><text x="442" y="154">partie commune, attributs des deux</text>
+<text x="14" y="326">ce qui reste hors de la seconde couche</text><text x="228" y="318">fusionne les entités de même valeur</text><text x="442" y="326">tout, découpé par les deux couches</text></g>
+</svg><figcaption>Figure 11.1 — Les traitements de base. Le résultat est figuré en couleur.</figcaption></figure>
+
+<div class="tab"><table><thead><tr><th>Question posée</th><th>Traitement</th><th>Résultat</th></tr></thead><tbody>
+<tr><td>Quel espace se trouve à moins de 300&nbsp;m des arrêts ?</td><td><strong>Tampon</strong></td><td>Polygones entourant chaque objet à la distance choisie ; option de regroupement pour fusionner les zones qui se recouvrent</td></tr>
+<tr><td>Je ne veux que les données de mon territoire d'étude.</td><td><strong>Couper</strong></td><td>La couche d'entrée limitée à l'emprise du masque ; les attributs du masque ne sont pas repris</td></tr>
+<tr><td>Quelle occupation du sol dans chaque commune ?</td><td><strong>Intersection</strong></td><td>Les parties communes, portant les attributs <em>des deux</em> couches</td></tr>
+<tr><td>Quelles zones constructibles échappent au risque ?</td><td><strong>Différence</strong></td><td>La couche d'entrée privée de ce que recouvre la seconde</td></tr>
+<tr><td>Je veux une seule entité par EPCI, par type de sol.</td><td><strong>Regrouper</strong></td><td>Les entités fusionnées selon un champ, ou toutes ensemble</td></tr>
+<tr><td>Combien d'arrêts, de logements, d'habitants par zone ?</td><td><strong>Compter les points dans les polygones</strong></td><td>Les polygones avec un champ de comptage, éventuellement pondéré</td></tr>
+<tr><td>Dans quelle commune se trouve chaque bâtiment ?</td><td><strong>Joindre les attributs par localisation</strong></td><td>La couche d'entrée enrichie des attributs de la couche qu'elle rencontre ; la variante «&nbsp;résumé&nbsp;» calcule sommes et moyennes</td></tr>
+<tr><td>Quelle surface totale par catégorie ?</td><td><strong>Statistiques par catégories</strong></td><td>Un tableau : effectif, somme, moyenne par modalité</td></tr>
+</tbody></table></div>
+
+<div class="box attention"><p class="t">Quatre vérifications avant tout traitement</p><ul>
+<li><strong>Même SCR projeté.</strong> Les distances d'un tampon s'expriment dans l'unité du SCR de la couche : 300 en Lambert-93 signifie 300&nbsp;m ; 300 en WGS&nbsp;84 signifie 300 degrés. Reprojetez d'abord avec l'outil <em>Reprojeter une couche</em>.</li>
+<li><strong>Géométries valides.</strong> Une erreur «&nbsp;géométrie invalide&nbsp;» se corrige avec l'outil <em>Réparer les géométries</em>, appliqué à la couche fautive.</li>
+<li><strong>Emprise réduite.</strong> Découpez les couches volumineuses sur votre terrain d'étude avant de les croiser : les calculs seront bien plus rapides.</li>
+<li><strong>Résultat enregistré.</strong> Par défaut, le résultat est une <em>couche temporaire</em>, perdue à la fermeture de QGIS et signalée par une icône de puce. Indiquez un fichier de sortie, ou enregistrez la couche temporaire par clic droit › <span class="menu">Rendre permanent</span>.</li></ul></div>
+<div class="box"><p class="t">Recalculer les surfaces</p><p>Après un découpage ou une intersection, les champs de surface hérités des couches d'origine sont faux : ils décrivent l'objet avant découpe. Recalculez toujours la surface avec <code>$area</code> dans la calculatrice de champ.</p></div>
+
+<div class="exo"><header><strong>Exercice 11 — Quelle part du territoire est desservie par le bus ?</strong><span>1 h · aménagement urbain</span></header><div>
+<p>On cherche la surface et le nombre de bâtiments situés à moins de 300&nbsp;m d'un arrêt de bus, distance de marche couramment retenue en planification des transports.</p>
+<div class="chaine"><span>arrêts</span><i>→</i><span>tampon 300 m regroupé</span><i>→</i><span>couper par l'agglomération</span><i>→</i><span>intersection avec les communes</span><i>→</i><span>surfaces et comptages</span></div>
+<ol class="pas" id="ex11">
+<li>Vérifiez que la couche des arrêts est en EPSG:2154. Sinon, reprojetez-la et enregistrez le résultat.</li>
+<li>Lancez <span class="menu">Vecteur › Outils de géotraitement › Tampon</span> : distance 300, case <em>Regrouper le résultat</em> cochée, sortie <code>arrets_300m.gpkg</code>.</li>
+<li>Regroupez les communes de l'agglomération en un seul polygone avec <em>Regrouper</em> : vous obtenez le contour de l'agglomération, <code>c2a_contour.gpkg</code>.</li>
+<li>Coupez le tampon par ce contour avec <em>Couper</em>.</li>
+<li>Croisez le tampon coupé et les communes avec <em>Intersection</em> : chaque morceau de tampon porte désormais le nom de sa commune.</li>
+<li>Dans la couche obtenue, calculez le champ <code>surf_desservie_ha</code> avec <code>$area / 10000</code>.</li>
+<li>Lancez <em>Statistiques par catégories</em> sur ce champ, par nom de commune. Joignez ce tableau à la couche des communes et calculez la part de la surface communale desservie.</li>
+<li>Sélectionnez par localisation les bâtiments qui intersectent le tampon. Notez leur nombre et rapportez-le au nombre total de bâtiments de l'agglomération.</li>
+<li>Représentez la part desservie par commune en aplats gradués et enregistrez le projet.</li>
+</ol>
+<p class="resultat">La part de bâtiments desservis est nettement supérieure à la part de surface desservie, puisque le réseau suit les secteurs denses. Les communes périphériques présentent de faibles taux. Discutez la limite de la méthode : un cercle de 300&nbsp;m à vol d'oiseau ignore les coupures (rivière, voie ferrée, rocade) et la fréquence de passage.</p>
+</div></div>
+
+<div class="metiers">
+<div class="urb"><p class="t">Aménagement urbain</p><p>Mesurer la consommation d'espaces naturels, agricoles et forestiers revient à intersecter deux millésimes d'occupation du sol, puis à sommer les surfaces passées d'une classe non artificialisée à une classe artificialisée. C'est le calcul sur lequel repose le suivi de l'objectif de sobriété foncière.</p></div>
+<div class="env"><p class="t">Environnement</p><p>Un tampon autour des cours d'eau, intersecté avec l'occupation du sol, décrit l'état des berges. Un tampon autour d'une installation classée ou d'une route bruyante, croisé avec la population, mesure une exposition.</p></div>
+</div>
+
+<details class="defi"><summary>Population exposée au risque d'inondation</summary><div>
+<p>Les données carroyées de l'Insee donnent le nombre d'habitants par carreau de 200&nbsp;m. Estimez la population de l'agglomération résidant en zone inondable par deux méthodes, et comparez :</p><ol>
+<li><strong>Par les carreaux</strong> : intersection des carreaux et de la zone inondable, puis population du carreau multipliée par la part de sa surface située en zone inondable.</li>
+<li><strong>Par le bâti</strong> : répartition de la population de chaque carreau entre ses bâtiments d'habitation, au prorata de leur surface de plancher approchée (emprise multipliée par le nombre d'étages), puis somme sur les bâtiments situés en zone inondable.</li></ol>
+<p>Quelle hypothèse chaque méthode fait-elle sur la répartition des habitants ? Laquelle vous paraît la plus défendable au bord d'une rivière ?</p></div></details>
+<details class="plus"><summary>la jointure spatiale pas à pas</summary><div><p>L'outil <em>Joindre les attributs par localisation</em> demande la couche à enrichir, la couche qui fournit les attributs, le prédicat (en général <em>intersecte</em> ou <em>est à l'intérieur</em>) et le type de jointure. Choisissez «&nbsp;un à un, première entité&nbsp;» lorsque chaque objet ne doit recevoir qu'une valeur, par exemple la commune d'un bâtiment. Pour les objets à cheval sur deux polygones, travaillez sur leurs centroïdes : un point n'appartient qu'à un polygone.</p></div></details>
+<figure class="video"><figcaption>Vidéo 11 — Tampon, découpage, intersection : la chaîne complète de l'exercice.</figcaption></figure>
+</section>
+
+
+<section class="module" id="m12" data-num="12" data-court="Rasters et relief">
+<div class="mod-tete"><div class="mod-num">12</div><div><h2>Exploiter les rasters et le relief</h2>
+<div class="mod-info"><span class="niv appro">Approfondissement</span><span>1 h 30</span></div></div></div>
+<div class="objectifs"><strong>À la fin de ce module, vous saurez</strong><ul>
+<li>lire et styliser un modèle numérique de terrain ;</li>
+<li>en dériver l'ombrage, la pente, l'exposition et les courbes de niveau ;</li>
+<li>résumer un raster par zone, et croiser raster et vecteur.</li></ul></div>
+<p class="conseil" data-debutant="Un raster se manipule comme une couche ordinaire. Seuls les outils de calcul diffèrent." data-initie="Travaillez surtout les statistiques de zone et la calculatrice raster."></p>
+<p>Un <strong>modèle numérique de terrain</strong> (MNT) est un raster dont chaque pixel contient l'altitude du sol. La <strong>résolution</strong>, c'est-à-dire la taille du pixel, fixe la finesse de l'analyse : le RGE ALTI de l'IGN est proposé au pas de 1&nbsp;m et de 5&nbsp;m. Un pas de 5&nbsp;m suffit largement à l'échelle d'une agglomération.</p>
+
+<h3>Préparer et styliser</h3>
+<ul>
+<li>Les MNT sont livrés en dalles. Assemblez-les avec <span class="menu">Raster › Divers › Construire un raster virtuel</span>, qui les réunit sans les recopier.</li>
+<li>Limitez-les à votre terrain avec <span class="menu">Raster › Extraction › Découper un raster selon une couche de masque</span>.</li>
+<li>Dans la symbologie, choisissez <em>Pseudo-couleur à bande unique</em> et une palette pour obtenir des teintes hypsométriques, ou <em>Ombrage</em> pour un rendu du relief calculé à l'affichage.</li>
+<li>L'outil <em>Identifier</em> donne l'altitude d'un pixel. L'outil <em>Profil d'élévation</em> (<span class="menu">Vue › Profil d'élévation</span>) trace une coupe le long d'une ligne dessinée sur la carte.</li>
+</ul>
+
+<h3>Les produits dérivés</h3>
+<div class="tab"><table><thead><tr><th>Outil (menu Raster › Analyse)</th><th>Produit</th><th>Usage</th></tr></thead><tbody>
+<tr><td>Ombrage</td><td>Estompage du relief sous un éclairage donné</td><td>Fond de carte : placé sous une couche semi-transparente, il fait ressortir le relief</td></tr>
+<tr><td>Pente</td><td>Inclinaison en degrés ou en pourcentage</td><td>Constructibilité, érosion, accessibilité, mécanisation agricole</td></tr>
+<tr><td>Exposition</td><td>Orientation du versant, de 0 à 360°</td><td>Ensoleillement, potentiel solaire, habitats naturels</td></tr>
+<tr><td>Contour (menu Raster › Extraction)</td><td>Courbes de niveau vectorielles</td><td>Habillage, lecture du relief sur un plan</td></tr>
+</tbody></table></div>
+<div class="box attention"><p class="t">Unités</p><p>Le calcul de pente suppose que les unités horizontales et verticales sont identiques. C'est le cas en Lambert-93 (mètres dans les deux sens). Sur un MNT en degrés, la pente calculée est fausse : reprojetez d'abord le raster.</p></div>
+
+<h3>Calculer et reclasser</h3>
+<p>La <strong>calculatrice raster</strong> (<span class="menu">Raster › Calculatrice raster</span>) applique une expression pixel par pixel. L'expression <code>"pente@1" &gt; 15</code> produit un raster binaire : 1 là où la pente dépasse 15&nbsp;%, 0 ailleurs. L'outil <em>Reclassification par table</em> transforme un raster continu en classes, par exemple quatre classes de pente.</p>
+
+<h3>Croiser raster et vecteur</h3>
+<ul>
+<li><strong>Statistiques de zone</strong> : calcule, pour chaque polygone d'une couche, la moyenne, le minimum, le maximum ou l'écart-type des pixels qu'il contient. On obtient ainsi l'altitude moyenne ou la pente moyenne par commune, par parcelle ou par zone du PLU.</li>
+<li><strong>Prélèvement des valeurs raster</strong> : attribue à chaque point la valeur du pixel sur lequel il se trouve, par exemple l'altitude de chaque arrêt de bus.</li>
+<li><strong>Polygoniser</strong> : convertit un raster de classes en polygones, pour le croiser ensuite avec d'autres couches vectorielles.</li>
+</ul>
+<div class="metiers">
+<div class="urb"><p class="t">Aménagement urbain</p><p>La pente conditionne le coût de viabilisation, l'accessibilité des piétons et des cyclistes, et la gestion des eaux pluviales. L'exposition renseigne sur le potentiel solaire d'un futur quartier.</p></div>
+<div class="env"><p class="t">Environnement</p><p>Croisée avec l'occupation du sol, la pente localise les secteurs sensibles à l'érosion et au ruissellement. Le MNT délimite aussi les bassins versants, unité de base de la gestion de l'eau.</p></div>
+</div>
+
+<div class="exo"><header><strong>Exercice 12 — Le relief de l'Albigeois et les pentes fortes</strong><span>50 min</span></header><div>
+<ol class="pas" id="ex12">
+<li>Chargez les dalles du MNT, construisez le raster virtuel, puis découpez-le selon <code>c2a_contour</code>. Enregistrez le résultat sous <code>mnt_c2a.tif</code>.</li>
+<li>Appliquez une palette hypsométrique. Avec l'outil Identifier, relevez l'altitude du Tarn à Albi et celle d'un point haut du territoire.</li>
+<li>Calculez l'ombrage. Placez-le sous le MNT coloré, auquel vous donnez 60&nbsp;% d'opacité.</li>
+<li>Calculez la pente en pourcentage : <code>pente_c2a.tif</code>.</li>
+<li>Avec la calculatrice raster, isolez les pentes supérieures à 15&nbsp;%.</li>
+<li>Lancez <em>Statistiques de zone</em> sur les communes avec le raster de pente : moyenne et maximum.</li>
+<li>Représentez la pente moyenne par commune en aplats gradués.</li>
+<li>Tracez un profil d'élévation transversal à la vallée du Tarn.</li>
+</ol>
+<p class="resultat">La vallée du Tarn apparaît nettement encaissée dans la partie amont du territoire, plus ouverte à l'aval. Les pentes fortes se concentrent sur les versants de la vallée et de ses affluents. La pente <em>moyenne</em> communale lisse ces contrastes : elle renseigne mal sur les contraintes locales, ce qui justifie de revenir au raster pour l'analyse fine.</p>
+</div></div>
+<details class="defi"><summary>Terrains constructibles en forte pente</summary><div><p>Polygonisez le raster des pentes supérieures à 15&nbsp;%, puis intersectez-le avec les zones à urbaniser du document d'urbanisme. Quelle surface de zones à urbaniser est concernée ? Quelles conséquences pour l'aménageur, et pour la gestion des eaux pluviales ?</p></div></details>
+<figure class="video"><figcaption>Vidéo 12 — Du MNT à la carte des pentes.</figcaption></figure>
+</section>
+
+
+<section class="module" id="m13" data-num="13" data-court="Automatiser et étendre">
+<div class="mod-tete"><div class="mod-num">13</div><div><h2>Automatiser et étendre QGIS</h2>
+<div class="mod-info"><span class="niv appro">Approfondissement</span><span>1 h</span></div></div></div>
+<div class="objectifs"><strong>À la fin de ce module, vous saurez</strong><ul>
+<li>retrouver et rejouer un traitement ;</li><li>appliquer un traitement à plusieurs couches en une fois ;</li>
+<li>assembler une chaîne de traitements dans le modeleur ;</li><li>installer une extension.</li></ul></div>
+<p class="conseil" data-debutant="Ce module est facultatif en première lecture. Revenez-y lorsque vous répéterez les mêmes opérations." data-initie="Ce module vous est d'abord destiné : construisez le modèle de l'exercice 13 et réutilisez-le dans les études de cas."></p>
+<p>Un diagnostic doit pouvoir être refait : sur un autre territoire, avec un millésime plus récent, ou parce qu'un paramètre change. Documenter et automatiser ses traitements rend l'analyse <strong>reproductible</strong>, ce que l'on attend d'un travail d'étude comme d'un mémoire.</p>
+
+<h3>L'historique et le traitement par lots</h3>
+<ul>
+<li><span class="menu">Traitement › Historique</span> conserve tous les traitements lancés, avec leurs paramètres. Un double-clic rouvre la fenêtre de l'outil préremplie. C'est aussi votre journal de bord : reportez-en l'essentiel dans votre rapport.</li>
+<li>Clic droit sur un outil de la boîte à outils › <span class="menu">Exécuter comme processus de lot…</span> ouvre un tableau où chaque ligne est une exécution : pratique pour découper dix couches par le même masque.</li>
+<li>Dans la fenêtre d'un outil, l'icône placée à côté d'une couche d'entrée permet de <em>parcourir les entités</em> : le traitement est alors répété pour chacune, par exemple une sortie par commune.</li>
+</ul>
+
+<h3>Le modeleur</h3>
+<p><span class="menu">Traitement › Modeleur…</span> ouvre un espace où l'on assemble une chaîne de traitements sous forme de schéma. Faites glisser des <strong>entrées</strong> (couche vecteur, nombre, champ) depuis le panneau de gauche, puis des <strong>algorithmes</strong>, et reliez-les : la sortie de l'un devient l'entrée du suivant. Nommez la sortie finale pour qu'elle soit chargée dans le projet. Le modèle enregistré apparaît dans la boîte à outils, rubrique <em>Modèles</em>, et se lance comme un outil ordinaire.</p>
+<div class="box v4"><p class="t">Selon votre version</p><p>En 4.x, les paramètres d'un algorithme du modèle se règlent dans un panneau latéral. En 3.44, ils s'ouvrent dans une fenêtre séparée. Le principe est identique.</p></div>
+<figure class="capture"><figcaption>Capture 13.1 — Modèle «&nbsp;desserte&nbsp;» dans le modeleur : entrées, algorithmes et sortie reliés.</figcaption></figure>
+
+<h3>Les extensions</h3>
+<p><span class="menu">Extensions › Installer/Gérer les extensions…</span> donne accès à plusieurs centaines de modules développés par la communauté. Recherchez par mot-clé, lisez la description, la date de dernière mise à jour et les avis, puis installez.</p>
+<div class="tab"><table><thead><tr><th>Besoin</th><th>Extension à rechercher</th></tr></thead><tbody>
+<tr><td>Télécharger des données OpenStreetMap par thème (commerces, pistes cyclables, écoles)</td><td>QuickOSM</td></tr>
+<tr><td>Calculer des itinéraires et des isochrones à pied, à vélo, en voiture</td><td>ORS Tools, ou les services de calcul d'itinéraire de la Géoplateforme</td></tr>
+<tr><td>Produire des graphiques interactifs à partir d'une table</td><td>Data Plotly</td></tr>
+<tr><td>Emporter un projet sur le terrain, avec un téléphone ou une tablette</td><td>QField Sync</td></tr>
+<tr><td>Enregistrer automatiquement le projet à intervalles réguliers</td><td>Autosaver</td></tr>
+</tbody></table></div>
+<div class="box attention"><p class="t">Compatibilité avec la série 4</p><p>Toutes les extensions n'ont pas encore été adaptées à QGIS&nbsp;4. Le gestionnaire ne liste que celles qui sont déclarées compatibles avec votre version : si l'une de celles du tableau n'apparaît pas, c'est qu'elle n'a pas encore été portée. Les fonctions intégrées de QGIS suffisent à tous les exercices de ce manuel.</p></div>
+
+<div class="exo"><header><strong>Exercice 13 — Un modèle «&nbsp;desserte&nbsp;» réutilisable</strong><span>40 min</span></header><div>
+<ol class="pas" id="ex13">
+<li>Ouvrez le modeleur. Ajoutez trois entrées : une couche de points «&nbsp;Équipements&nbsp;», une couche de polygones «&nbsp;Territoire&nbsp;», un nombre «&nbsp;Distance&nbsp;» (valeur par défaut 300).</li>
+<li>Ajoutez l'algorithme <em>Tampon</em> : entrée «&nbsp;Équipements&nbsp;», distance reliée à l'entrée «&nbsp;Distance&nbsp;», regroupement activé.</li>
+<li>Ajoutez <em>Couper</em> : entrée, la sortie du tampon ; masque, «&nbsp;Territoire&nbsp;».</li>
+<li>Ajoutez <em>Intersection</em> entre la sortie du découpage et «&nbsp;Territoire&nbsp;».</li>
+<li>Ajoutez la <em>Calculatrice de champ</em> pour créer <code>surf_ha</code> ; nommez sa sortie «&nbsp;Zone desservie&nbsp;».</li>
+<li>Enregistrez le modèle sous <code>desserte.model3</code> et exécutez-le avec les arrêts de bus et les communes.</li>
+<li>Exécutez-le de nouveau avec une distance de 500&nbsp;m, puis avec une autre couche de points : écoles, pharmacies ou espaces verts.</li>
+</ol>
+<p class="resultat">Trois résultats en quelques secondes, au lieu de reprendre la chaîne de l'exercice&nbsp;11 à la main. Le schéma du modèle, exporté en image, constitue en outre la meilleure illustration de la méthode dans un rapport.</p>
+</div></div>
+<figure class="video"><figcaption>Vidéo 13 — Construction et exécution d'un modèle.</figcaption></figure>
+</section>
+<!-- ============================ PARTIE D ============================ -->
+<section class="module" id="m14" data-num="14" data-court="Étude de cas : urbanisme" data-partie="D · Études de cas">
+<div class="mod-tete"><div class="mod-num">14</div><div><h2>Étude de cas en aménagement urbain : où construire sans s'étaler ?</h2>
+<div class="mod-info"><span class="niv synth">Synthèse</span><span>3 h · en autonomie ou en binôme</span></div></div></div>
+<p class="conseil" data-debutant="Les étapes sont indiquées, non les clics. Reportez-vous aux modules cités chaque fois que nécessaire." data-initie="Traitez le cas sans consulter les modules, et construisez un modèle pour les étapes 3 à 6."></p>
+<figure class="video"><figcaption>Vidéo 14 — Lancement de l'étude de cas : la commande, les données, la démarche.</figcaption></figure>
+
+<h3>La commande</h3>
+<p>L'agglomération albigeoise révise son document de planification. Pour limiter la consommation d'espaces naturels, agricoles et forestiers, les élus souhaitent savoir quel potentiel de construction subsiste <strong>à l'intérieur des zones déjà urbanisées</strong>, <strong>à proximité des transports collectifs</strong> et <strong>à l'abri du risque d'inondation</strong>. Vous êtes chargé d'études et devez fournir une carte, un tableau par commune et une note de méthode d'une page.</p>
+
+<h3>Traduire la commande en critères spatiaux</h3>
+<div class="tab"><table><thead><tr><th>Critère de la commande</th><th>Traduction spatiale</th><th>Donnée</th><th>Module</th></tr></thead><tbody>
+<tr><td>Dans les zones urbanisées ou à urbaniser</td><td>Zones U et AU du document d'urbanisme</td><td>Géoportail de l'urbanisme</td><td class="num">4, 8</td></tr>
+<tr><td>Proche des transports collectifs</td><td>À moins de 300&nbsp;m d'un arrêt</td><td>Arrêts du réseau (GTFS)</td><td class="num">5, 11</td></tr>
+<tr><td>Hors risque d'inondation</td><td>Hors zonage réglementaire inondation</td><td>Géorisques</td><td class="num">11</td></tr>
+<tr><td>Terrain disponible</td><td>Parcelle ne portant aucun bâtiment, d'au moins 500&nbsp;m²</td><td>Parcelles cadastrales, bâtiments de la BD TOPO</td><td class="num">4, 5</td></tr>
+</tbody></table></div>
+<p>Cette traduction est le cœur du travail : chaque seuil (300&nbsp;m, 500&nbsp;m²) est un choix, que la note de méthode devra justifier.</p>
+<div class="chaine"><span>zones U et AU</span><i>∩</i><span>tampon 300 m des arrêts</span><i>−</i><span>zone inondable</span><i>=</i><span>secteur favorable</span><i>→</i><span>parcelles non bâties ≥ 500 m²</span><i>→</i><span>bilan par commune</span></div>
+
+<div class="exo"><header><strong>Déroulement</strong><span>cochez chaque étape une fois le résultat contrôlé</span></header><div>
+<ol class="pas" id="cas1">
+<li><strong>Préparer.</strong> Créez un projet <code>cas_urbain.qgz</code> en EPSG:2154. Chargez le contour de l'agglomération, les communes, les arrêts, le zonage d'urbanisme, la zone inondable, les parcelles et les bâtiments. Découpez sur l'agglomération les couches qui la débordent.</li>
+<li><strong>Zones urbanisables.</strong> Dans le zonage, repérez le champ qui code le type de zone et sélectionnez les zones U et AU. Exportez-les, puis regroupez-les en une seule entité.</li>
+<li><strong>Proximité des transports.</strong> Reprenez ou recalculez le tampon de 300&nbsp;m regroupé autour des arrêts.</li>
+<li><strong>Croiser.</strong> Intersectez les zones urbanisables et le tampon.</li>
+<li><strong>Exclure le risque.</strong> Retranchez la zone inondable du résultat avec <em>Différence</em>. Vous obtenez le <em>secteur favorable</em>.</li>
+<li><strong>Repérer les parcelles non bâties.</strong> Sélectionnez les parcelles situées à l'intérieur du secteur favorable, exportez-les, puis sélectionnez parmi elles celles qui sont <em>disjointes</em> de la couche des bâtiments. Exportez cette seconde sélection.</li>
+<li><strong>Filtrer par la taille.</strong> Calculez la surface de chaque parcelle et ne conservez que celles d'au moins 500&nbsp;m².</li>
+<li><strong>Contrôler.</strong> Affichez le résultat sur l'orthophotographie. Examinez une vingtaine de parcelles : s'agit-il vraiment de terrains disponibles ?</li>
+<li><strong>Chiffrer.</strong> Rattachez chaque parcelle à sa commune, puis produisez par commune le nombre de parcelles et la surface totale en hectares.</li>
+<li><strong>Cartographier.</strong> Réalisez une mise en page A4 : parcelles retenues, secteur favorable, arrêts, zone inondable, fond discret. Ajoutez le tableau par commune.</li>
+<li><strong>Rédiger la note de méthode</strong> : données et millésimes, chaîne de traitements, seuils retenus, limites.</li>
+</ol>
+<p class="resultat">Une couche de parcelles candidates, un tableau de 16 lignes et une carte. Le potentiel se concentre logiquement dans les communes desservies par le réseau, donc dans le cœur de l'agglomération.</p>
+</div></div>
+
+<h3>Discuter le résultat</h3>
+<p>Le contrôle sur l'orthophotographie montre que beaucoup de parcelles «&nbsp;non bâties&nbsp;» ne sont pas disponibles. Votre note doit le dire. Quelques pistes :</p>
+<ul>
+<li><strong>Nature réelle du terrain.</strong> Parkings, cours d'école, jardins attenants à une maison située sur la parcelle voisine, espaces verts publics, emprises ferroviaires ou voiries cadastrées.</li>
+<li><strong>Propriété et rétention foncière.</strong> Une parcelle libre n'est pas à vendre. Les Fichiers fonciers du Cerema, présentés lors de la séance sur les sources, renseignent sur les propriétaires et regroupent les parcelles en unités foncières.</li>
+<li><strong>Autres contraintes.</strong> Pente, servitudes, périmètres de protection patrimoniale, sols pollués, enjeux écologiques.</li>
+<li><strong>Densification du bâti existant.</strong> La méthode ignore les grandes parcelles déjà bâties qui pourraient être divisées, ainsi que les friches et les logements vacants.</li>
+<li><strong>Critère de desserte.</strong> Un arrêt desservi deux fois par jour ne vaut pas un arrêt desservi toutes les dix minutes.</li>
+</ul>
+<p>Un SIG produit un <strong>gisement théorique</strong>. Le passage au gisement mobilisable exige un travail de terrain et un dialogue avec les services d'urbanisme : c'est précisément la compétence que l'on attend de vous.</p>
+<details class="defi"><summary>Tester la sensibilité des seuils</summary><div><p>Refaites le calcul avec une distance de 500&nbsp;m et un seuil de surface de 300&nbsp;m². De combien le potentiel varie-t-il ? Présentez les quatre combinaisons dans un tableau. Que conseillez-vous aux élus sur l'usage du chiffre unique ?</p></div></details>
+</section>
+
+
+<section class="module" id="m15" data-num="15" data-court="Étude de cas : environnement">
+<div class="mod-tete"><div class="mod-num">15</div><div><h2>Étude de cas en environnement : l'état des berges du Tarn et de ses affluents</h2>
+<div class="mod-info"><span class="niv synth">Synthèse</span><span>3 h · en autonomie ou en binôme</span></div></div></div>
+<p class="conseil" data-debutant="Même principe que pour le cas précédent : les étapes sont données, les clics sont à retrouver dans les modules." data-initie="Ajoutez à l'analyse le défi sur les continuités, et comparez deux largeurs de corridor."></p>
+<figure class="video"><figcaption>Vidéo 15 — Lancement de l'étude de cas : la commande, les données, la démarche.</figcaption></figure>
+
+<h3>La commande</h3>
+<p>Le syndicat de rivière prépare son programme pluriannuel de restauration. Il a besoin d'un état des lieux des <strong>abords des cours d'eau</strong> sur le territoire de l'agglomération : quelle occupation du sol borde les rivières, où la végétation rivulaire est-elle absente, quelles pressions s'exercent, et quels tronçons traiter en priorité ?</p>
+
+<h3>Traduire la commande en critères spatiaux</h3>
+<div class="tab"><table><thead><tr><th>Question</th><th>Traduction spatiale</th><th>Donnée</th><th>Module</th></tr></thead><tbody>
+<tr><td>Qu'appelle-t-on les abords ?</td><td>Corridor de 50&nbsp;m de part et d'autre des cours d'eau</td><td>Cours d'eau de la BD TOPO</td><td class="num">11</td></tr>
+<tr><td>Quelle occupation du sol ?</td><td>Répartition des classes de couverture dans le corridor</td><td>OCS GE</td><td class="num">11</td></tr>
+<tr><td>Quelles pressions ?</td><td>Surfaces artificialisées et bâtiments dans le corridor</td><td>OCS GE, bâtiments</td><td class="num">4, 11</td></tr>
+<tr><td>Quelle sensibilité ?</td><td>Pentes fortes aux abords, sans couvert végétal</td><td>MNT</td><td class="num">12</td></tr>
+<tr><td>Quels enjeux reconnus ?</td><td>Part du corridor comprise dans un zonage d'inventaire ou de protection</td><td>ZNIEFF, Natura 2000</td><td class="num">4, 11</td></tr>
+</tbody></table></div>
+<div class="chaine"><span>cours d'eau</span><i>→</i><span>tampon 50 m</span><i>∩</i><span>occupation du sol</span><i>→</i><span>surfaces par classe et par commune</span><i>+</i><span>bâti, pente, zonages</span><i>→</i><span>tronçons prioritaires</span></div>
+
+<div class="exo"><header><strong>Déroulement</strong><span>cochez chaque étape une fois le résultat contrôlé</span></header><div>
+<ol class="pas" id="cas2">
+<li><strong>Préparer.</strong> Créez un projet <code>cas_environnement.qgz</code> en EPSG:2154. Chargez et découpez sur l'agglomération les cours d'eau, l'occupation du sol, les bâtiments, le MNT et les zonages d'inventaire.</li>
+<li><strong>Délimiter le corridor.</strong> Tampon de 50&nbsp;m autour des cours d'eau, résultat regroupé, puis coupé par le contour de l'agglomération.</li>
+<li><strong>Découper le corridor par commune</strong> en l'intersectant avec la couche des communes.</li>
+<li><strong>Croiser avec l'occupation du sol.</strong> Intersectez le corridor communal et l'OCS GE. Recalculez les surfaces en hectares.</li>
+<li><strong>Simplifier la nomenclature.</strong> Créez un champ <code>famille</code> qui regroupe les codes de couverture en quatre familles : formations arborées, autres végétations, surfaces en eau, surfaces artificialisées. Reportez-vous à la notice de l'OCS GE pour la signification des codes.</li>
+<li><strong>Chiffrer.</strong> Produisez, par commune, la surface et la part de chaque famille dans le corridor.</li>
+<li><strong>Mesurer la pression du bâti.</strong> Comptez les bâtiments qui intersectent le corridor, par commune.</li>
+<li><strong>Repérer la sensibilité à l'érosion.</strong> Calculez la pente, isolez les pentes supérieures à 15&nbsp;%, puis repérez dans le corridor les secteurs à la fois pentus et dépourvus de formations arborées.</li>
+<li><strong>Situer les enjeux reconnus.</strong> Calculez la part du corridor comprise dans une ZNIEFF ou un site Natura&nbsp;2000.</li>
+<li><strong>Synthétiser.</strong> Dans la couche des communes, réunissez trois indicateurs : part arborée du corridor, nombre de bâtiments, surface pentue non boisée. Proposez un classement des communes en trois niveaux de priorité, en explicitant votre règle.</li>
+<li><strong>Cartographier et rédiger.</strong> Une carte de l'occupation du sol dans le corridor, une carte de synthèse, et une note de méthode d'une page.</li>
+</ol>
+<p class="resultat">Un tableau par commune et deux cartes. On s'attend à un corridor plus artificialisé dans la traversée urbaine d'Albi et de Saint-Juéry, plus boisé sur les versants encaissés, et à dominante agricole le long des petits affluents.</p>
+</div></div>
+
+<h3>Discuter le résultat</h3>
+<ul>
+<li><strong>Largeur du corridor.</strong> Cinquante mètres est une convention. Elle convient à un petit affluent, moins au Tarn, dont le lit dépasse cette largeur par endroits. Une largeur proportionnelle au rang du cours d'eau serait plus juste.</li>
+<li><strong>Précision des données.</strong> L'occupation du sol à grande échelle ne décrit pas une haie étroite ni un alignement d'arbres. L'absence de classe arborée ne prouve pas l'absence de ripisylve : l'orthophotographie et le terrain restent nécessaires.</li>
+<li><strong>Unité d'analyse.</strong> La commune est commode mais n'a pas de sens hydrologique. Un découpage par tronçon de rivière ou par sous-bassin versant répondrait mieux aux besoins du syndicat.</li>
+<li><strong>Zonages.</strong> Une ZNIEFF est un inventaire, non une protection réglementaire. Ne confondez pas les deux dans votre commentaire.</li>
+<li><strong>Dimension sociale.</strong> L'analyse spatiale ne dit rien des usages des berges ni des propriétaires riverains, acteurs décisifs de toute restauration.</li>
+</ul>
+<details class="defi"><summary>Repérer les interruptions de la continuité boisée</summary><div><p>Découpez les cours d'eau en tronçons de 200&nbsp;m (outil <em>Diviser les lignes par longueur maximale</em>), créez un tampon de 20&nbsp;m autour de chaque tronçon sans regrouper, puis calculez pour chacun la part de formations arborées. Représentez les tronçons selon cette part. Où se situent les principales interruptions ? Cette représentation linéaire vous paraît-elle plus utile au syndicat que le tableau par commune ?</p></div></details>
+</section>
+
+
+<!-- ============================ ANNEXES ============================ -->
+<section id="aide" data-num="·" data-court="Aide-mémoire" data-partie="Annexes">
+<h2 style="padding-top:3.2rem">Aide-mémoire</h2>
+<h3>Raccourcis utiles</h3>
+<div class="tab"><table><thead><tr><th>Action</th><th>Raccourci</th></tr></thead><tbody>
+<tr><td>Rechercher un outil, une couche, une entité</td><td><kbd>Ctrl</kbd>+<kbd>K</kbd></td></tr>
+<tr><td>Enregistrer le projet</td><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td></tr>
+<tr><td>Gestionnaire des sources de données</td><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td></tr>
+<tr><td>Table d'attributs</td><td><kbd>F6</kbd></td></tr>
+<tr><td>Panneau Style de couche</td><td><kbd>F7</kbd></td></tr>
+<tr><td>Sélection par valeur / par expression</td><td><kbd>F3</kbd> / <kbd>Ctrl</kbd>+<kbd>F3</kbd></td></tr>
+<tr><td>Tout désélectionner</td><td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>A</kbd></td></tr>
+<tr><td>Identifier les entités</td><td><kbd>Ctrl</kbd>+<kbd>Maj</kbd>+<kbd>I</kbd></td></tr>
+<tr><td>Boîte à outils de traitements</td><td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>T</kbd></td></tr>
+<tr><td>Nouvelle mise en page</td><td><kbd>Ctrl</kbd>+<kbd>P</kbd></td></tr>
+<tr><td>Masquer ou afficher les panneaux</td><td><kbd>Ctrl</kbd>+<kbd>Tab</kbd></td></tr>
+<tr><td>Se déplacer dans la carte</td><td>barre d'espace maintenue, ou clic sur la molette</td></tr>
+</tbody></table></div>
+<p>Sous macOS, remplacez <kbd>Ctrl</kbd> par <kbd>Cmd</kbd>. Les raccourcis se consultent et se modifient dans <span class="menu">Préférences › Raccourcis clavier</span>.</p>
+
+<h3>Écrire une expression</h3>
+<div class="tab"><table><thead><tr><th>Élément</th><th>Écriture</th><th>Exemple</th></tr></thead><tbody>
+<tr><td>Nom de champ</td><td>guillemets doubles</td><td><code>"POPULATION"</code></td></tr>
+<tr><td>Texte</td><td>apostrophes</td><td><code>'Albi'</code></td></tr>
+<tr><td>Nombre</td><td>point décimal, sans guillemets</td><td><code>12.5</code></td></tr>
+<tr><td>Comparaison</td><td><code>= &lt;&gt; &lt; &gt; &lt;= &gt;=</code></td><td><code>"densite" &gt;= 500</code></td></tr>
+<tr><td>Combinaison</td><td><code>AND</code>, <code>OR</code>, <code>NOT</code></td><td><code>"type" = 'U' OR "type" = 'AU'</code></td></tr>
+<tr><td>Liste de valeurs</td><td><code>IN (…)</code></td><td><code>"INSEE_DEP" IN ('81', '12')</code></td></tr>
+<tr><td>Texte approché</td><td><code>LIKE</code>, <code>ILIKE</code> et <code>%</code></td><td><code>"NOM" ILIKE 'saint%'</code></td></tr>
+<tr><td>Valeur absente</td><td><code>IS NULL</code>, <code>IS NOT NULL</code></td><td><code>"hauteur" IS NULL</code></td></tr>
+<tr><td>Géométrie</td><td><code>$area</code>, <code>$length</code>, <code>$perimeter</code></td><td><code>$area / 10000</code></td></tr>
+<tr><td>Assembler des textes</td><td><code>||</code></td><td><code>"NOM" || ' (' || "INSEE_COM" || ')'</code></td></tr>
+</tbody></table></div>
+
+<h3>En cas de difficulté</h3>
+<div class="tab"><table><thead><tr><th>Constat</th><th>Vérification</th></tr></thead><tbody>
+<tr><td>La couche est chargée mais invisible</td><td>Clic droit › Zoomer sur la couche. Si elle apparaît très loin des autres, son SCR est mal déclaré : propriétés › Source › définir le SCR correct.</td></tr>
+<tr><td>Le projet signale des couches introuvables</td><td>Un fichier a été déplacé ou renommé. Indiquez son nouvel emplacement dans la fenêtre proposée, et enregistrez les chemins en relatif.</td></tr>
+<tr><td>Un panneau ou une barre d'outils a disparu</td><td>Vue › Panneaux, ou Vue › Barres d'outils.</td></tr>
+<tr><td>La jointure ne renvoie que des valeurs NULL</td><td>Type et contenu des deux identifiants : voir le tableau du module&nbsp;5.</td></tr>
+<tr><td>Un traitement échoue avec «&nbsp;géométrie invalide&nbsp;»</td><td>Appliquez <em>Réparer les géométries</em> à la couche concernée, puis relancez.</td></tr>
+<tr><td>Le tampon est gigantesque ou minuscule</td><td>La couche est en degrés : reprojetez-la en EPSG:2154.</td></tr>
+<tr><td>Le résultat d'un traitement a disparu à la réouverture</td><td>C'était une couche temporaire. Relancez le traitement depuis l'historique en indiquant un fichier de sortie.</td></tr>
+<tr><td>Les outils de dessin sont grisés</td><td>La couche n'est pas en mode édition, ou n'est pas sélectionnée dans le panneau Couches.</td></tr>
+<tr><td>Les accents sont illisibles dans la table</td><td>Propriétés › Source › Encodage : essayez UTF-8, puis ISO-8859-1.</td></tr>
+<tr><td>QGIS est très lent</td><td>Désactivez l'affichage des couches lourdes, filtrez ou découpez les données, limitez les flux WFS à l'emprise de la vue.</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="glossaire" data-num="·" data-court="Glossaire et ressources">
+<h2 style="padding-top:3.2rem">Glossaire</h2>
+<dl class="gloss">
+<dt>Attribut</dt><dd>Information descriptive associée à une entité, stockée dans un champ de la table.</dd>
+<dt>Centroïde</dt><dd>Point situé au centre de gravité d'un polygone.</dd>
+<dt>Couche</dt><dd>Ensemble d'entités de même nature et de même type de géométrie, ou raster.</dd>
+<dt>Discrétisation</dt><dd>Découpage d'une série statistique en classes.</dd>
+<dt>Emprise</dt><dd>Rectangle englobant une couche ou la zone affichée.</dd>
+<dt>Entité</dt><dd>Objet géographique d'une couche vecteur : une géométrie et une ligne de la table.</dd>
+<dt>EPSG</dt><dd>Registre international qui attribue un code à chaque système de coordonnées.</dd>
+<dt>Géoréférencement</dt><dd>Opération qui donne des coordonnées à un document qui n'en a pas.</dd>
+<dt>Géotraitement</dt><dd>Opération qui produit une nouvelle couche à partir d'une ou plusieurs couches.</dd>
+<dt>Jointure attributaire</dt><dd>Rattachement d'un tableau à une couche par un identifiant commun.</dd>
+<dt>Jointure spatiale</dt><dd>Rattachement des attributs d'une couche à une autre selon leur position relative.</dd>
+<dt>LTR</dt><dd><em>Long Term Release</em> : version de QGIS maintenue à long terme.</dd>
+<dt>Métadonnées</dt><dd>Description d'une donnée : producteur, date, méthode, précision, licence.</dd>
+<dt>MNT</dt><dd>Modèle numérique de terrain : raster des altitudes du sol.</dd>
+<dt>Prédicat spatial</dt><dd>Relation géométrique entre deux objets : intersecte, contient, touche…</dd>
+<dt>Raster</dt><dd>Donnée formée d'une grille de pixels portant chacun une valeur.</dd>
+<dt>Résolution</dt><dd>Dimension au sol d'un pixel.</dd>
+<dt>SCR</dt><dd>Système de coordonnées de référence.</dd>
+<dt>Topologie</dt><dd>Règles de voisinage entre géométries : pas de chevauchement, pas d'interstice.</dd>
+<dt>Vecteur</dt><dd>Donnée formée d'objets géométriques : points, lignes, polygones.</dd>
+<dt>WMS, WMTS, WFS</dt><dd>Services normalisés de diffusion de données en flux (module 8).</dd>
+</dl>
+
+<h2 style="padding-top:3.2rem">Ressources</h2>
+<ul>
+<li><a href="https://docs.qgis.org/">Documentation officielle de QGIS</a> : manuel de l'utilisateur et manuel d'exercices, en français.</li>
+<li><a href="https://tutoqgis.cnrs.fr/">Tutoriel QGIS du CNRS</a> : un cours complet et progressif, en français.</li>
+<li><a href="https://cartes.gouv.fr/">cartes.gouv.fr</a> : catalogue, téléchargement et flux des données de l'IGN et de ses partenaires.</li>
+<li><a href="https://www.data.gouv.fr/">data.gouv.fr</a> : plateforme nationale des données ouvertes.</li>
+<li><a href="https://www.insee.fr/fr/statistiques">Insee</a> : statistiques locales, recensement, données carroyées.</li>
+<li><a href="https://www.cerema.fr/fr/centre-ressources/boutique/georeferencement-rgf93">Fiches du Cerema sur le RGF93 et le Lambert-93</a>.</li>
+</ul>
+</section>
+<footer class="pied">
+  <p>Manuel rédigé pour QGIS 4.4 (novembre 2026), à partir du support «&nbsp;Initiation à la géomatique avec QGIS&nbsp;3&nbsp;». Les intitulés de menus sont ceux de l'interface en français&nbsp;; ils peuvent varier légèrement d'une version corrective à l'autre. Votre progression (étapes cochées, modules terminés) est enregistrée uniquement dans ce navigateur.</p>
+</footer>
+</main>
+</div>
+
+<script>
+(function(){
+  /* --- mémoire locale (facultative : la page fonctionne sans) --- */
+  var CLE='manuel-qgis44', etat={pas:{},fait:{},profil:'debutant'};
+  try{var s=localStorage.getItem(CLE); if(s){var o=JSON.parse(s); for(var k in o) etat[k]=o[k];}}catch(e){}
+  function sauver(){try{localStorage.setItem(CLE,JSON.stringify(etat));}catch(e){}}
+  function $$(sel,ctx){return Array.prototype.slice.call((ctx||document).querySelectorAll(sel));}
+
+  /* --- sommaire construit à partir des sections --- */
+  var som=document.getElementById('som'), liens={};
+  $$('main > section').forEach(function(sec){
+    if(sec.dataset.partie){var p=document.createElement('div'); p.className='part'; p.textContent=sec.dataset.partie; som.appendChild(p);}
+    var a=document.createElement('a'); a.href='#'+sec.id;
+    var n=document.createElement('span'); n.className='n'; n.textContent=sec.dataset.num||'·';
+    var t=document.createElement('span'); t.textContent=sec.dataset.court||sec.querySelector('h2').textContent;
+    a.appendChild(n); a.appendChild(t); som.appendChild(a); liens[sec.id]=a;
+  });
+  var somD=document.getElementById('som-d');
+  if(window.matchMedia('(max-width:900px)').matches) somD.open=false;
+  som.addEventListener('click',function(e){ if(e.target.closest('a') && window.matchMedia('(max-width:900px)').matches) somD.open=false; });
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(en){
+      if(en.isIntersecting){ for(var id in liens) liens[id].classList.remove('actif'); liens[en.target.id].classList.add('actif'); }
+    });},{rootMargin:'-15% 0px -75% 0px'});
+    $$('main > section').forEach(function(s){io.observe(s);});
+  }
+
+  /* --- étapes à cocher --- */
+  $$('ol.pas').forEach(function(ol,i){
+    var base=ol.id||('pas'+i);
+    $$(':scope > li',ol).forEach(function(li,j){
+      var id=base+'-'+(j+1), corps=document.createElement('div');
+      while(li.firstChild) corps.appendChild(li.firstChild);
+      var lab=document.createElement('label'), cb=document.createElement('input');
+      cb.type='checkbox'; cb.id=id; cb.setAttribute('aria-label','Étape '+(j+1)+' réalisée');
+      cb.checked=!!etat.pas[id]; li.classList.toggle('coche',cb.checked);
+      cb.addEventListener('change',function(){ if(cb.checked) etat.pas[id]=1; else delete etat.pas[id]; li.classList.toggle('coche',cb.checked); sauver(); });
+      lab.appendChild(cb); li.appendChild(lab); li.appendChild(corps);
+    });
+  });
+
+  /* --- QCM auto-corrigés : la bonne réponse porte l'attribut data-ok --- */
+  $$('.qcm').forEach(function(qcm,i){
+    var tete=qcm.querySelector('.t'), score=document.createElement('span'); tete.appendChild(score);
+    var qs=$$('.q',qcm), bons=0, rep=0;
+    function maj(){ score.textContent=rep?(bons+' / '+qs.length):''; }
+    qs.forEach(function(q,j){
+      $$('li',q).forEach(function(li,k){
+        var b=document.createElement('button'); b.type='button'; b.id='qcm'+i+'-'+j+'-'+k;
+        b.innerHTML=li.innerHTML; var ok=li.hasAttribute('data-ok'); li.innerHTML=''; li.appendChild(b);
+        b.addEventListener('click',function(){
+          if(q.classList.contains('repondu')) return;
+          q.classList.add('repondu'); rep++; if(ok) bons++; else b.classList.add('faux');
+          $$('li',q).forEach(function(l){ var bb=l.firstChild; bb.disabled=true; if(l.hasAttribute('data-ok')) bb.classList.add('juste'); });
+          maj();
+        });
+      });
+    });
+  });
+
+  /* --- modules terminés et jauge --- */
+  var mods=$$('section.module'), jb=document.getElementById('jauge-b'), jt=document.getElementById('jauge-t');
+  function jauge(){ var n=mods.filter(function(m){return etat.fait[m.id];}).length;
+    jb.style.width=(100*n/mods.length)+'%'; jt.textContent=n+' / '+mods.length+' modules'; }
+  mods.forEach(function(m){
+    var d=document.createElement('div'); d.className='termine';
+    var b=document.createElement('button'); b.type='button'; b.className='btn'; b.id='fait-'+m.id;
+    function maj(){ var f=!!etat.fait[m.id]; b.setAttribute('aria-pressed',f); b.textContent=f?'Module terminé ✓':'Marquer ce module comme terminé'; liens[m.id].classList.toggle('fait',f); }
+    b.addEventListener('click',function(){ if(etat.fait[m.id]) delete etat.fait[m.id]; else etat.fait[m.id]=1; sauver(); maj(); jauge(); });
+    d.appendChild(b);
+    var nx=m.nextElementSibling; if(nx&&nx.id){ var a=document.createElement('a'); a.href='#'+nx.id; a.textContent='Suite : '+(nx.dataset.court||nx.querySelector('h2').textContent)+' →'; d.appendChild(a); }
+    m.appendChild(d); maj();
+  });
+  jauge();
+
+  /* --- profil : adapte le conseil de parcours et ouvre les défis --- */
+  function profil(p){
+    etat.profil=p; document.body.dataset.profil=p;
+    $$('.seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.profil===p); });
+    $$('.conseil').forEach(function(c){ c.textContent = c.dataset[p] || ''; c.hidden=!c.textContent; });
+    $$('details.defi').forEach(function(d){ d.open = (p==='initie'); });
+  }
+  $$('.seg button').forEach(function(b){ b.addEventListener('click',function(){ profil(b.dataset.profil); sauver(); }); });
+  profil(etat.profil==='initie'?'initie':'debutant');
+})();
+</script>
+
+</body></html>

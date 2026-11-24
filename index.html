@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Manuel QGIS 4.4 – M1</title>
+<title>Manuel QGIS 4.2 – M1</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -189,7 +189,7 @@ footer.pied{margin-top:4rem; padding-top:1rem; border-top:2px solid var(--ink); 
 </style>
 
 <div class="topbar"><div class="topbar-in">
-  <div class="brand">Initiation à la géomatique avec QGIS&nbsp;4.4<small>Master 1 · Ville et environnement urbain · Gestion sociale de l'environnement</small></div>
+  <div class="brand">Initiation à la géomatique avec QGIS&nbsp;4.2<small>Master 1 · Ville et environnement urbain · Gestion sociale de l'environnement</small></div>
   <div class="seg" role="group" aria-label="Votre profil">
     <button type="button" id="profil-debutant" data-profil="debutant" aria-pressed="true">Je débute</button>
     <button type="button" id="profil-initie" data-profil="initie" aria-pressed="false">J'ai déjà pratiqué</button>
@@ -214,13 +214,12 @@ footer.pied{margin-top:4rem; padding-top:1rem; border-top:2px solid var(--ink); 
 <section id="accueil" data-num="·" data-court="Avant de commencer" data-partie="Introduction">
 <div class="couv">
   <p class="eyebrow">Manuel interactif · pas à pas</p>
-  <h1>Initiation à la géomatique avec QGIS&nbsp;4.4</h1>
+  <h1>Initiation à la géomatique avec QGIS&nbsp;4.2</h1>
   <p class="chapo">Treize modules progressifs pour apprendre à mobiliser un système d'information géographique au service d'un diagnostic territorial, sur un terrain commun : l'agglomération albigeoise et le département du Tarn.</p>
-  <div class="meta"><span>Version de référence : QGIS 4.4</span><span>Données : open data (IGN, Insee, Géorisques, INPN…)</span><span>Projection : RGF93 / Lambert-93 (EPSG:2154)</span></div>
+  <div class="meta"><span>Version de référence : QGIS 4.2</span><span>Données : open data (IGN, Insee, Géorisques, INPN…)</span><span>Projection : RGF93 / Lambert-93 (EPSG:2154)</span></div>
 </div>
 
 <h2 style="margin-top:2rem">Avant de commencer</h2>
-<figure class="video"><figcaption>Vidéo 0 — Présentation du manuel et de son mode d'emploi.</figcaption></figure>
 
 <h3>Pourquoi un SIG dans vos futurs métiers ?</h3>
 <p>Après Magrit, qui sert à <em>représenter</em> une statistique, et le diagnostic territorial, qui sert à <em>décrire</em> un territoire, QGIS permet de <em>croiser</em> des informations localisées pour répondre à une question d'aménagement ou de gestion. Les questions suivantes, que vous rencontrerez en bureau d'études, en collectivité ou dans un service de l'État, ne peuvent pas recevoir de réponse sans ce croisement spatial.</p>
@@ -402,11 +401,11 @@ footer.pied{margin-top:4rem; padding-top:1rem; border-top:2px solid var(--ink); 
 <li>la <strong>dernière version</strong>, qui apporte les nouveautés mais peut comporter des défauts de jeunesse.</li>
 </ul>
 <div class="box v4"><p class="t">Situation en novembre 2026</p>
-<p>Ce manuel est rédigé pour <strong>QGIS&nbsp;4.4</strong>, publiée le 30&nbsp;octobre 2026 et désignée comme prochaine LTR. Le canal «&nbsp;LTR&nbsp;» du site distribue encore la 3.44 jusqu'en mars&nbsp;2027 : pour obtenir la 4.4, choisissez donc pour l'instant la «&nbsp;dernière version&nbsp;». Les deux versions peuvent être installées côte à côte. Si le poste que vous utilisez est resté en 3.44, tout ce manuel reste applicable : les rares différences sont signalées dans des encadrés en pointillés comme celui-ci.</p></div>
+<p>Ce manuel est rédigé pour <strong>QGIS&nbsp;4.2</strong>, publiée le 30&nbsp;octobre 2026 et désignée comme prochaine LTR. Le canal «&nbsp;LTR&nbsp;» du site distribue encore la 3.44 jusqu'en mars&nbsp;2027 : pour obtenir la 4.2, choisissez donc pour l'instant la «&nbsp;dernière version&nbsp;». Les deux versions peuvent être installées côte à côte. Si le poste que vous utilisez est resté en 3.44, tout ce manuel reste applicable : les rares différences sont signalées dans des encadrés en pointillés comme celui-ci.</p></div>
 <div class="box v4"><p class="t">Ce qui change avec la série 4</p>
 <ul>
 <li>Le logiciel repose sur une nouvelle base technique (Qt&nbsp;6). L'organisation des menus et des panneaux est conservée.</li>
-<li>Les projets créés en 3.x s'ouvrent en 4.x. L'inverse n'est pas garanti : ne réenregistrez pas en 4.4 un projet que vous devez rouvrir en 3.44.</li>
+<li>Les projets créés en 3.x s'ouvrent en 4.x. L'inverse n'est pas garanti : ne réenregistrez pas en 4.2 un projet que vous devez rouvrir en 3.44.</li>
 <li>Certaines extensions anciennes n'ont pas encore été adaptées à la série&nbsp;4. Le gestionnaire d'extensions ne propose que celles qui sont compatibles.</li>
 <li>À l'ouverture d'un projet contenant du code (macros, actions), QGIS demande désormais si vous faites confiance au projet. Refusez pour un fichier d'origine inconnue.</li>
 <li>La page d'accueil a été redessinée, et la mise en page gagne de nouveaux éléments (graphiques, options de synchronisation de la légende).</li>
@@ -438,7 +437,7 @@ footer.pied{margin-top:4rem; padding-top:1rem; border-top:2px solid var(--ink); 
 <tr><td><strong>Barre d'état</strong></td><td>Coordonnées du curseur, échelle, et bouton du SCR du projet en bas à droite.</td></tr>
 <tr><td><strong>Barre de localisation</strong></td><td>En bas à gauche (<kbd>Ctrl</kbd>+<kbd>K</kbd>). Tapez quelques lettres pour trouver un outil, une couche ou une entité.</td></tr>
 </tbody></table></div>
-<figure class="capture"><figcaption>Capture 2.1 — Fenêtre principale de QGIS 4.4 avec le projet Albigeois ouvert, zones annotées.</figcaption></figure>
+<figure class="capture"><figcaption>Capture 2.1 — Fenêtre principale de QGIS 4.2 avec le projet Albigeois ouvert, zones annotées.</figcaption></figure>
 <div class="box astuce"><p class="t">Trois réflexes</p><ul>
 <li><kbd>Ctrl</kbd>+<kbd>K</kbd> puis le nom d'un outil («&nbsp;tampon&nbsp;», «&nbsp;jointure&nbsp;») : vous n'avez pas à mémoriser les menus.</li>
 <li>Clic droit sur une couche › <span class="menu">Zoomer sur la couche</span> : pour retrouver une couche «&nbsp;perdue&nbsp;».</li>
@@ -1391,7 +1390,7 @@ FIN ETUDES DE CAS MASQUEES -->
 </ul>
 </section>
 <footer class="pied">
-  <p>Manuel rédigé pour QGIS 4.4 (novembre 2026) par F.Martorell. Les intitulés de menus sont ceux de l'interface en français&nbsp;; ils peuvent varier légèrement d'une version corrective à l'autre. Votre progression (étapes cochées, modules terminés) est enregistrée uniquement dans ce navigateur.</p>
+  <p>Manuel rédigé pour QGIS 4.2 (novembre 2026) par F.Martorell. Les intitulés de menus sont ceux de l'interface en français&nbsp;; ils peuvent varier légèrement d'une version corrective à l'autre. Votre progression (étapes cochées, modules terminés) est enregistrée uniquement dans ce navigateur.</p>
 </footer>
 </main>
 </div>
